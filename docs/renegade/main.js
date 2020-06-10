@@ -79,9 +79,9 @@ Vue.component('square', {
         },
         pieceSize: function() {
             if (this.piece === othello.Colors.Black || this.piece === othello.Colors.White) {
-                return "16px";
+                return "32px";
             } else if (this.validMove == othello.Colors.Black || this.validMove == othello.Colors.White) {
-                return "4px";
+                return "8px";
             } else {
                 return "0px";
             }
@@ -105,21 +105,32 @@ Vue.component('game', {
     template: gameTemplate,
     computed: {},
     data() {
+        var gameStates = [new othello.Game()];
+
         return {
-            gameState: new othello.Game(),
+            gameStates: gameStates,
+            gameState: gameStates[gameStates.length-1],
             first: 'Player',
-        }
+        };
     },
     methods: {
         clicked(move) {
-            this.gameState = this.gameState.move(move.row, move.col);
+            var newGameState = this.gameState.move(move.row, move.col);
+            if (newGameState) {
+                this.gameStates.push(newGameState);
+            }
+            this.gameState = this.gameStates[this.gameStates.length-1];
         },
         newGame() {
-            this.gameState = new othello.Game();
+            this.gameStates.push(new othello.Game());
+            this.gameState = this.gameStates[this.gameStates.length-1];
         },
         undo() {
-
-        }
+            if (this.gameStates.length > 1) {
+                this.gameStates.pop();
+                this.gameState = this.gameStates[this.gameStates.length-1];
+            }
+        },
     }
 });
 
