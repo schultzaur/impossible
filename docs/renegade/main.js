@@ -133,11 +133,11 @@ Vue.component('game', {
     },
     methods: {
         clicked(move) {
-            var turn = this.gameState.turn;
-            
+            var oppositeTurn = othello.getOppositeColor(this.gameState.turn);
+
             var newGame = this.move(move);
 
-            while (newGame && newGame.turn != turn) {
+            while (newGame && newGame.turn == oppositeTurn) {
                 var cpu_move = ai.findBestMove(this.gameState.board, this.gameState.turn);
                 newGame = this.move({ row: cpu_move[0], col: cpu_move[1] });
 
@@ -201,6 +201,10 @@ class Game {
     getValidMovesBoard() {
         var validMoves = othello.getEmptyBoard();
 
+        if (this.turn == othello.Colors.None) {
+            return validMoves;
+        }
+
         this.board.validMoves[this.turn].forEach(validMove => {
             validMoves[validMove[0]][validMove[1]] = this.turn;
         })
@@ -209,21 +213,17 @@ class Game {
     }
 
     move(row, col) {
-        console.log(row, col, this.turn);
-
-        if (!othello.isValidMove(this.board.board, row, col, this.turn)) {
+        if (this.turn == othello.Colors.None || !othello.isValidMove(this.board.board, row, col, this.turn)) {
             return false;
         }
-        
-        console.log(row, col);
 
         var oppositeTurn = othello.getOppositeColor(this.turn)
-        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);;
+        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);
 
-        var nextTurn = null;
-        if (newBoard.validMoves[oppositeTurn]) {
+        var nextTurn = othello.Colors.None;
+        if (newBoard.validMoves[oppositeTurn].length > 0) {
             nextTurn = oppositeTurn;
-        } else if (newBoard.validMoves[this.turn]) {
+        } else if (newBoard.validMoves[this.turn].length > 0) {
             nextTurn = this.turn;
         }
 

@@ -6,7 +6,7 @@ const BRANCHING_FACTOR = 6;
 const PARITY_WEIGHT = 10;
 const MOBILITY_WEIGHT = 30;
 const CORNER_WEIGHT = 25;
-const STABILITY_WEIGHT = 25;
+const STABILITY_WEIGHT = 30;
 
 // row, col, line start direction, line direction.
 const corners = [
@@ -128,8 +128,9 @@ function heuristic(board, maxColor, minColor) {
     if (maxParity + minParity < 10) {
         mobilityWeight = 2 * MOBILITY_WEIGHT;
         stabilityWeight = 2 * STABILITY_WEIGHT;
- 
-        parityWeight = PARITY_WEIGHT;
+
+        parityWeight = 1/2 * PARITY_WEIGHT;
+
         cornerWeight = CORNER_WEIGHT;
     } else if (maxParity + minParity > 50) {
         stabilityWeight = 4 * STABILITY_WEIGHT;
@@ -140,7 +141,7 @@ function heuristic(board, maxColor, minColor) {
     } else {
         parityWeight = PARITY_WEIGHT;
         mobilityWeight = MOBILITY_WEIGHT;
-        cornerWeight = 2 * CORNER_WEIGHT;
+        cornerWeight = CORNER_WEIGHT;
         stabilityWeight = STABILITY_WEIGHT;
     }
 
@@ -157,8 +158,8 @@ function heuristic(board, maxColor, minColor) {
 
 function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
     var oppositeColor = othello.getOppositeColor(currentColor);
-    if (!board.validMoves[currentColor]) {
-        if (board.validMoves[oppositeColor]) {
+    if (!board.validMoves[currentColor].length > 0) {
+        if (board.validMoves[oppositeColor].length > 0) {
             currentColor = oppositeColor;
         } else {
             return [boardScore, [-1, -1]]
