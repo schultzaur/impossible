@@ -55,12 +55,66 @@ const directions = [
     [ 1, 1],
 ];
 
+export function isValidCaptureDirection(board, row, col, direction, color, oppositeColor) {
+    var pieceCaptured = false;
+
+    var capRow = row + direction[0];
+    var capCol = col + direction[1];
+
+    while (onBoard(capRow, capCol)) {
+        if (board[capRow][capCol] === oppositeColor) {
+            pieceCaptured = true;
+        } else {
+            break;
+        }
+
+        capRow += direction[0];
+        capCol += direction[1];
+    }
+
+    return pieceCaptured && onBoard(capRow, capCol) && board[capRow][capCol] === color;
+}
+
+export function getValidMoves(board, color) {
+    var validMoves = new Array();
+
+    for (var row = 0; row < 8; row++) {
+        for (var col = 0; col < 8; col++) {
+            if (isValidMove(board, row, col, color)) {
+                validMoves.push([row, col]);
+            }
+        }
+    }
+   
+    return validMoves;
+}
+
+
+export function isValidMove(board, row, col, color) {
+    if (!onBoard(row, col)) {
+        return false;
+    }
+    
+    var oppositeColor = getOppositeColor(color);
+
+    if (board[row][col] === color || board[row][col] === oppositeColor) {
+        return false;
+    }
+
+    return directions.some(direction => isValidCaptureDirection(board, row, col, direction, color, oppositeColor));
+}
+
+
 export class Board {
     constructor (board) {
         this.board = (typeof board !== 'undefined') ? board : getNewBoard();
+        this.validMoves = {
+            [Colors.White]: getValidMoves(this.board, Colors.White),
+            [Colors.Black]: getValidMoves(this.board, Colors.Black),
+        };
     }
 
-    copy() {
+    copyBoard() {
         var newBoard = new Array(BOARD_SIZE);
 
         for (var row = 0; row < 8; row++) {
@@ -70,65 +124,21 @@ export class Board {
             }
         }
 
-        return new Board(newBoard);
-    }
-
-    getValidMoves(color) {
-        var validMoves = getEmptyBoard();
-
-        for (var row = 0; row < 8; row++) {
-            for (var col = 0; col < 8; col++) {
-                if (this.isValidMove(row, col, color)) {
-                    validMoves[row][col] = color;
-                }
-            }
-        }
-       
-        return validMoves;
-    }
-
-    isValidMove(row, col, color) {
-        var oppositeColor = getOppositeColor(color);
-
-        if (this.board[row][col] === color || this.board[row][col] === oppositeColor) {
-            return false;
-        }
-
-        return directions.some(direction => this.isValidCaptureDirection(row, col, direction, color, oppositeColor));
-    }
-
-    isValidCaptureDirection(row, col, direction, color, oppositeColor) {
-        var pieceCaptured = false;
-
-        var capRow = row + direction[0];
-        var capCol = col + direction[1];
-
-        while (onBoard(capRow, capCol)) {
-            if (this.board[capRow][capCol] === oppositeColor) {
-                pieceCaptured = true;
-            } else {
-                break;
-            }
-
-            capRow += direction[0];
-            capCol += direction[1];
-        }
-
-        return pieceCaptured && onBoard(capRow, capCol) && this.board[capRow][capCol] === color;
+        return newBoard;
     }
 
     move(row, col, color, oppositeColor) {
         var pieceCaptured = false;
-        var newBoard = this.copy();
+        var newBoard = this.copyBoard();
         
         directions.forEach(direction => {
-            if (newBoard.isValidCaptureDirection(row, col, direction, color, oppositeColor)) {
+            if (isValidCaptureDirection(newBoard, row, col, direction, color, oppositeColor)) {
                 pieceCaptured = true;
                 var capRow = row + direction[0];
                 var capCol = col + direction[1];
 
-                while (onBoard(capRow, capCol) && newBoard.board[capRow][capCol] !== color) {
-                    newBoard.board[capRow][capCol] = color
+                while (onBoard(capRow, capCol) && newBoard[capRow][capCol] !== color) {
+                    newBoard[capRow][capCol] = color
                     capRow += direction[0];
                     capCol += direction[1];
                 }
@@ -136,45 +146,10 @@ export class Board {
         })
         
         if (pieceCaptured) {
-            newBoard.board[row][col] = color;
-            return newBoard;
+            newBoard[row][col] = color;
+            return new Board(newBoard);
         }
 
         return false;
-    }
-}
-
-export class Game {
-    constructor(board, turn, validMoves, lastMove) {
-        this.board = (typeof board !== 'undefined') ? board : new Board();
-        this.turn = (typeof turn !== 'undefined') ? turn : Colors.Black;
-        this.validMoves = (typeof validMoves !== 'undefined') ? validMoves : this.board.getValidMoves(this.turn);
-        this.lastMove = (typeof lastMove !== 'undefined') ? lastMove : [-1,-1];
-    }
-
-    move(row, col) {
-        if (!this.board.isValidMove(row, col, this.turn)) {
-            return false;
-        }
-
-        var oppositeTurn = getOppositeColor(this.turn)
-        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);;
-
-        var nextTurn = null;
-        var validMoves = newBoard.getValidMoves(oppositeTurn);
-        if (validMoves) {
-            nextTurn = oppositeTurn;
-        } else {
-            validMoves = newBoard.getValidMoves(this.turn);
-            if (validMoves) {
-                nextTurn = this.turn;
-            }
-        }
-        
-        return new Game(newBoard, nextTurn, validMoves, [row, col]);
-    }
-
-    findBestMove() {
-
     }
 }
