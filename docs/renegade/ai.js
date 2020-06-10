@@ -1,7 +1,7 @@
 import * as othello from './othello.js';
 
 const DEPTH = 6;
-const BRANCHING_FACTOR = 6;
+const BRANCHING_FACTOR = 10;
 
 const PARITY_WEIGHT = 10;
 const MOBILITY_WEIGHT = 30;
@@ -125,11 +125,11 @@ function heuristic(board, maxColor, minColor) {
     }
 
     var mobilityWeight, stabilityWeight, parityWeight, cornerWeight;
-    if (maxParity + minParity < 10) {
+    if (maxParity + minParity < 30) {
         mobilityWeight = 2 * MOBILITY_WEIGHT;
         stabilityWeight = 2 * STABILITY_WEIGHT;
 
-        parityWeight = 1/2 * PARITY_WEIGHT;
+        parityWeight = -PARITY_WEIGHT;
 
         cornerWeight = CORNER_WEIGHT;
     } else if (maxParity + minParity > 50) {
@@ -139,7 +139,7 @@ function heuristic(board, maxColor, minColor) {
         mobilityWeight = MOBILITY_WEIGHT;
         parityWeight = PARITY_WEIGHT;
     } else {
-        parityWeight = PARITY_WEIGHT;
+        parityWeight = 0 * PARITY_WEIGHT;
         mobilityWeight = MOBILITY_WEIGHT;
         cornerWeight = CORNER_WEIGHT;
         stabilityWeight = STABILITY_WEIGHT;
