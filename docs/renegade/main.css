@@ -18,6 +18,10 @@
     margin-bottom: 4px;
 }
 
+.gameLink {
+    margin-top: 4px;
+}
+
 .square {
     background: var(--background, green);
     border: 1px solid black;

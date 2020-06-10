@@ -6,11 +6,6 @@ export const Colors = {
     Black: 2,
 }
 
-export const Player = {
-    Player: 1,
-    CPU: 2,
-}
-
 export function getEmptyBoard() {
     return new Array(BOARD_SIZE).fill(0).map(() => new Array(BOARD_SIZE).fill(Colors.None));
 }

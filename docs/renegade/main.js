@@ -1,44 +1,6 @@
 import * as ai from './ai.js';
 import * as othello from './othello.js';
 
-export class Game {
-    constructor(board, turn, lastMove) {
-        this.board = (typeof board !== 'undefined') ? board : new othello.Board();
-        this.turn = (typeof turn !== 'undefined') ? turn : othello.Colors.Black;
-        this.validMovesBoard = this.getValidMovesBoard();
-        this.lastMove = (typeof lastMove !== 'undefined') ? lastMove : [-1,-1];
-    }
-
-    getValidMovesBoard() {
-        var validMoves = othello.getEmptyBoard();
-        this.board.validMoves[this.turn].forEach(validMove => {
-            validMoves[validMove[0]][validMove[1]] = this.turn;
-        })
-       
-
-        return validMoves;
-    }
-
-    move(row, col) {
-        if (!othello.isValidMove(this.board.board, row, col, this.turn)) {
-            return false;
-        }
-
-        var oppositeTurn = othello.getOppositeColor(this.turn)
-        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);;
-
-        var nextTurn = null;
-        if (newBoard.validMoves[oppositeTurn]) {
-            nextTurn = oppositeTurn;
-        } else if (newBoard.validMoves[this.turn]) {
-            nextTurn = this.turn;
-        }
-
-        return new Game(newBoard, nextTurn, [row, col]);
-    }
-}
-
-
 var gameTemplate = 
 `<div class="game">
     <board
@@ -47,15 +9,20 @@ var gameTemplate =
     </board>
     <div class="controls">
         <br>
-        <input type="radio" id="player" value="Player" v-model="first"> 
+        <input type="radio" id="player" v-bind:value="player" v-model="first"> 
         <label for="player">Player First</label>
         <br>
-        <input type="radio" id="cpu" value="CPU" v-model="first">
+        <input type="radio" id="cpu" v-bind:value="cpu" v-model="first">
         <label for="cpu">CPU First</label>
         <br>
         <button v-on:click="newGame()">New Game</button>
         <br>
         <button v-on:click="undo()">Undo</button>
+    </div>
+    <br>
+    <div class="gameLink"> 
+        <button v-on:click="copyGameLink()">Copy Game Link</button>
+        <input type="text" v-bind:value="gameLink" id="gameLinkInput"></input>
     </div>
 </div>`
 
@@ -144,26 +111,39 @@ Vue.component('game', {
     template: gameTemplate,
     computed: {},
     data() {
-        var gameStates = [new Game()];
+        var urlParams = new URLSearchParams(window.location.search);
+        var gameState = Game.fromGameLink(urlParams);
 
         return {
-            gameStates: gameStates,
-            gameState: gameStates[gameStates.length-1],
-            first: 'Player',
+            gameStates: [gameState],
+            gameState: gameState,
+            first: gameState.player == othello.Colors.Black ? Players.Player : Players.CPU,
         };
+    },
+    computed: {
+        player : function() {
+            return Players.Player;
+        },
+        cpu: function() {
+            return Players.CPU;
+        },
+        gameLink: function() {
+            return this.gameState.getGameLink();
+        }
     },
     methods: {
         clicked(move) {
             var turn = this.gameState.turn;
             
-            this.move(move);
+            var newGame = this.move(move);
 
-            while (this.gameState.turn != turn) {
+            while (newGame && newGame.turn != turn) {
                 var cpu_move = ai.findBestMove(this.gameState.board, this.gameState.turn);
-                
-                if (!this.move({ row: cpu_move[0], col: cpu_move[1] })) {
-                    break;
-                };
+                newGame = this.move({ row: cpu_move[0], col: cpu_move[1] });
+
+                if (!newGame) {
+                    console.log("oopsy", cpu_move, this.gameState);
+                }
             }
         },
         move(move) {
@@ -178,7 +158,7 @@ Vue.component('game', {
             this.gameStates.push(new Game());
             this.gameState = this.gameStates[this.gameStates.length-1];
 
-            if (this.first === "CPU") {
+            if (this.first === Players.CPU) {
                 var middle = Math.floor(othello.BOARD_SIZE/2) - 1;
                 this.move({ row: middle-1, col: middle});
             }
@@ -189,10 +169,105 @@ Vue.component('game', {
                 this.gameState = this.gameStates[this.gameStates.length-1];
             }
         },
+        copyGameLink() {
+            var input = $('#gameLinkInput')[0]
+            input.select();
+            input.setSelectionRange(0,1000);
+            window.document.execCommand("copy");
+
+            if (window.getSelection) {
+                window.getSelection().removeAllRanges();
+            } else if (document.selection) {
+                document.selection.empty();
+            }
+        }
     }
 });
 
+const Players = {
+    Player: 1,
+    CPU: 2,
+}
+
+class Game {
+    constructor(board, playerColor, turnColor, lastMove) {
+        this.board = (typeof board !== 'undefined') ? board : new othello.Board();
+        this.player = (typeof playerColor !== 'undefined') ? playerColor : othello.Colors.Black;
+        this.turn = (typeof turnColor !== 'undefined') ? turnColor : othello.Colors.Black;
+        this.lastMove = (typeof lastMove !== 'undefined') ? lastMove : [-1,-1];
+        this.validMovesBoard = this.getValidMovesBoard();
+    }
+
+    getValidMovesBoard() {
+        var validMoves = othello.getEmptyBoard();
+
+        this.board.validMoves[this.turn].forEach(validMove => {
+            validMoves[validMove[0]][validMove[1]] = this.turn;
+        })
+       
+        return validMoves;
+    }
+
+    move(row, col) {
+        console.log(row, col, this.turn);
+
+        if (!othello.isValidMove(this.board.board, row, col, this.turn)) {
+            return false;
+        }
+        
+        console.log(row, col);
+
+        var oppositeTurn = othello.getOppositeColor(this.turn)
+        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);;
+
+        var nextTurn = null;
+        if (newBoard.validMoves[oppositeTurn]) {
+            nextTurn = oppositeTurn;
+        } else if (newBoard.validMoves[this.turn]) {
+            nextTurn = this.turn;
+        }
+
+        return new Game(newBoard, this.player, nextTurn, [row, col]);
+    }
+
+    getGameLink() {
+        var path;
+        if (document.baseURI.indexOf("127.0.0.1") > -1) {
+            path = "./renegade.html";
+        } else {
+            path = "./renegade";
+        }
+
+        var board = JSON.stringify(this.board.board);
+        var player = JSON.stringify(this.player);
+        var currentPlayer = JSON.stringify(this.turn);
+        var lastMove = JSON.stringify(this.lastMove);
+        
+        path += `?board=${board}&player=${player}&currentPlayer=${currentPlayer}&lastMove=${lastMove}`
+
+        return new URL(path, document.baseURI).href;
+    }
+
+    static fromGameLink(urlParams) {
+        try {
+            var board = JSON.parse(urlParams.get('board'));
+            var playerColor = JSON.parse(urlParams.get('player'));
+            var turnColor = JSON.parse(urlParams.get('currentPlayer'));
+            var lastMove = JSON.parse(urlParams.get('lastMove'));
+
+            if (board && playerColor && turnColor && lastMove) {
+                return new Game(new othello.Board(board), playerColor, turnColor, lastMove);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }        
+        
+        return new Game();
+    }
+}
+
 export function loadApp()
 {
-    var app = new Vue({el: '#app'});    
+    var app = new Vue({el: '#app'});
 }

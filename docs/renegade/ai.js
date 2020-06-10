@@ -1,11 +1,11 @@
 import * as othello from './othello.js';
 
-const DEPTH = 5;
-const BRANCHING_FACTOR = 10;
+const DEPTH = 6;
+const BRANCHING_FACTOR = 6;
 
 const PARITY_WEIGHT = 10;
-const MOBILITY_WEIGHT = 20;
-const CORNER_WEIGHT = 40;
+const MOBILITY_WEIGHT = 30;
+const CORNER_WEIGHT = 25;
 const STABILITY_WEIGHT = 25;
 
 // row, col, line start direction, line direction.
@@ -132,7 +132,7 @@ function heuristic(board, maxColor, minColor) {
         parityWeight = PARITY_WEIGHT;
         cornerWeight = CORNER_WEIGHT;
     } else if (maxParity + minParity > 50) {
-        stabilityWeight = 2 * STABILITY_WEIGHT;
+        stabilityWeight = 4 * STABILITY_WEIGHT;
         cornerWeight = 2 * CORNER_WEIGHT;
 
         mobilityWeight = MOBILITY_WEIGHT;
@@ -140,25 +140,33 @@ function heuristic(board, maxColor, minColor) {
     } else {
         parityWeight = PARITY_WEIGHT;
         mobilityWeight = MOBILITY_WEIGHT;
-        cornerWeight = CORNER_WEIGHT;
+        cornerWeight = 2 * CORNER_WEIGHT;
         stabilityWeight = STABILITY_WEIGHT;
     }
 
-    return parityWeight * parity
-        + mobilityWeight * mobility
-        + cornerWeight * corner
-        + stabilityWeight * stable;
+    return [
+        parityWeight * parity
+            + mobilityWeight * mobility
+            + cornerWeight * corner
+            + stabilityWeight * stable,
+        parity,
+        mobility,
+        corner,
+        stable];
 }
 
 function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
-
+    var oppositeColor = othello.getOppositeColor(currentColor);
     if (!board.validMoves[currentColor]) {
-        currentColor = oppositeColor(currentColor);
+        if (board.validMoves[oppositeColor]) {
+            currentColor = oppositeColor;
+        } else {
+            return [boardScore, [-1, -1]]
+        }
     }
 
-    if (depth == DEPTH || !board.validMoves[currentColor])
+    if (depth == DEPTH)
     {
-        //console.log("leaf", boardScore, board.validMoves[currentColor])
         return [boardScore, [-1, -1]]
     }
 
@@ -170,7 +178,7 @@ function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
         var candidates = []
         board.validMoves[maxColor].forEach(validMove => {
             var candidateBoard = board.move(validMove[0], validMove[1], maxColor, minColor);
-            var score = heuristic(board, maxColor, minColor);
+            var score = heuristic(board, maxColor, minColor)[0];
 
             candidates.push([score, validMove, candidateBoard])
         })
@@ -182,7 +190,7 @@ function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
             };
 
             var mm = minimax(candidate[2], candidate[0], maxColor, minColor, depth + 1, othello.getOppositeColor(currentColor));
-            if (mm[0] > value) {
+            if (mm[0] >= value) {
                 value = mm[0];
                 move = candidate[1]
             };
@@ -196,7 +204,7 @@ function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
         var candidates = []
         board.validMoves[minColor].forEach(validMove => {
             var candidateBoard = board.move(validMove[0], validMove[1], minColor, maxColor);
-            var score = heuristic(board, maxColor, minColor);
+            var score = heuristic(board, maxColor, minColor)[0];
 
             candidates.push([score, validMove, candidateBoard])
         })
@@ -208,7 +216,7 @@ function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
             };
 
             var mm = minimax(candidate[2], candidate[0], maxColor, minColor, depth + 1, othello.getOppositeColor(currentColor));
-            if (mm[0] < value) {
+            if (mm[0] <= value) {
                 value = mm[0];
                 move = candidate[1]
             }
@@ -221,8 +229,8 @@ function minimax(board, boardScore, maxColor, minColor, depth, currentColor) {
 export function findBestMove(board, maxColor) {
     var minColor = othello.getOppositeColor(maxColor);
     var boardScore = heuristic(board, maxColor, minColor);
-    var mm = minimax(board, boardScore, maxColor, minColor, 0, maxColor);
+    var mm = minimax(board, boardScore[0], maxColor, minColor, 0, maxColor);
 
-    console.log(boardScore, mm[1]);
+    console.log(boardScore, mm);
     return mm[1];
 }
