@@ -152,26 +152,26 @@ export class Game {
         this.lastMove = (typeof lastMove !== 'undefined') ? lastMove : [-1,-1];
     }
 
-    move(row, col) {        
+    move(row, col) {
+        if (!this.board.isValidMove(row, col, this.turn)) {
+            return false;
+        }
+
         var oppositeTurn = getOppositeColor(this.turn)
         var newBoard = this.board.move(row, col, this.turn, oppositeTurn);;
 
-        if (newBoard) {
-            var nextTurn = null;
-            var validMoves = newBoard.getValidMoves(oppositeTurn);
+        var nextTurn = null;
+        var validMoves = newBoard.getValidMoves(oppositeTurn);
+        if (validMoves) {
+            nextTurn = oppositeTurn;
+        } else {
+            validMoves = newBoard.getValidMoves(this.turn);
             if (validMoves) {
-                nextTurn = oppositeTurn;
-            } else {
-                validMoves = newBoard.getValidMoves(this.turn);
-                if (validMoves) {
-                    nextTurn = this.turn;
-                }
+                nextTurn = this.turn;
             }
-            
-            return new Game(newBoard, nextTurn, validMoves, [row, col]);
         }
-
-        return false;
+        
+        return new Game(newBoard, nextTurn, validMoves, [row, col]);
     }
 
     findBestMove() {
