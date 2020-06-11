@@ -69,7 +69,7 @@ Vue.component('square', {
             }
         },
         piece: function() {
-            return this.gameState.board.board[this.row][this.col];
+            return this.gameState.board.pieces[this.row][this.col];
         },
         validMove: function() {
             return this.gameState.validMovesBoard[this.row][this.col];
@@ -140,10 +140,6 @@ Vue.component('game', {
             while (newGame && newGame.turn == oppositeTurn) {
                 var cpu_move = ai.findBestMove(this.gameState.board, this.gameState.turn);
                 newGame = this.move({ row: cpu_move[0], col: cpu_move[1] });
-
-                if (!newGame) {
-                    console.log("oopsy", cpu_move, this.gameState);
-                }
             }
         },
         move(move) {
@@ -213,13 +209,17 @@ class Game {
     }
 
     move(row, col) {
-        if (this.turn == othello.Colors.None || !othello.isValidMove(this.board.board, row, col, this.turn)) {
+        if (this.turn == othello.Colors.None || !othello.isValidMove(this.board.pieces, row, col, this.turn)) {
             return false;
         }
 
         var oppositeTurn = othello.getOppositeColor(this.turn)
-        var newBoard = this.board.move(row, col, this.turn, oppositeTurn);
+        var newPieces = this.board.move(row, col, this.turn, oppositeTurn);
 
+        if (!newPieces) {
+            return false;
+        }
+        var newBoard = new othello.Board(newPieces);
         var nextTurn = othello.Colors.None;
         if (newBoard.validMoves[oppositeTurn].length > 0) {
             nextTurn = oppositeTurn;
@@ -238,25 +238,25 @@ class Game {
             path = "./renegade";
         }
 
-        var board = JSON.stringify(this.board.board);
+        var pieces = JSON.stringify(this.board.pieces);
         var player = JSON.stringify(this.player);
         var currentPlayer = JSON.stringify(this.turn);
         var lastMove = JSON.stringify(this.lastMove);
         
-        path += `?board=${board}&player=${player}&currentPlayer=${currentPlayer}&lastMove=${lastMove}`
+        path += `?pieces=${pieces}&player=${player}&currentPlayer=${currentPlayer}&lastMove=${lastMove}`
 
         return new URL(path, document.baseURI).href;
     }
 
     static fromGameLink(urlParams) {
         try {
-            var board = JSON.parse(urlParams.get('board'));
+            var pieces = JSON.parse(urlParams.get('pieces'));
             var playerColor = JSON.parse(urlParams.get('player'));
             var turnColor = JSON.parse(urlParams.get('currentPlayer'));
             var lastMove = JSON.parse(urlParams.get('lastMove'));
 
-            if (board && playerColor && turnColor && lastMove) {
-                return new Game(new othello.Board(board), playerColor, turnColor, lastMove);
+            if (pieces && playerColor && turnColor && lastMove) {
+                return new Game(new othello.Board(pieces), playerColor, turnColor, lastMove);
             }
         }
         catch (error) {
