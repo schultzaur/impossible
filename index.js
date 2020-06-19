@@ -37,12 +37,35 @@ async function doStuff() {
         return cStr;
     }
 
-    const a = "0xf0000001";
-    const b = "0xff000011";
+    const a = "0xf000000000000001";
+    const b = "0xff00000000000011";
     console.log(doXor(a, b));
     document.body.appendChild(component(doXor(a, b)));
     document.body.appendChild(component(doLsh(b, 2)));
     document.body.appendChild(component(doRsh(b, 2)));
+
+    const { BitBoard, getBitBoard } = myModule.exports;
+    
+    function doBitBoardThings(aStr, bStr, color, move) {
+        let aPtr = __retain(__allocString(aStr));
+        let bPtr = __retain(__allocString(bStr));
+        let bbPtr = getBitBoard(aPtr, bPtr);
+        let bb = BitBoard.wrap(bbPtr);
+        let bb2Ptr = bb.move(color, move);
+        let bb2 = BitBoard.wrap(bb2Ptr);
+        let cPtr = bb2.getPieces();
+        let cStr = __getString(cPtr);
+        __release(aPtr);
+        __release(bPtr);
+        __release(bbPtr);
+        __release(bb2Ptr);
+        __release(cPtr);
+        return cStr;
+    }
+
+    for(var i = 0; i < 64; i++) {
+        document.body.appendChild(component(("0" + i).slice(-2) + "|" + doBitBoardThings("0x0", b, 0, i)));
+    }
 }
 
 function component(s) {
