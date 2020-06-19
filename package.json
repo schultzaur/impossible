@@ -1,0 +1,35 @@
+{
+  "name": "impossible",
+  "version": "0.0.0",
+  "description": "Various tools and game AIs for Clubhouse Games.",
+  "private": true,
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "node tests",
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "wpbuild": "webpack",
+    "build": "npm run asbuild && npm run wpbuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schultzaur/impossible.git"
+  },
+  "author": "schultzaur",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/schultzaur/impossible/issues"
+  },
+  "homepage": "https://github.com/schultzaur/impossible#readme",
+  "dependencies": {
+    "@assemblyscript/loader": "^0.10.1"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.12.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}

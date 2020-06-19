@@ -8,6 +8,14 @@ const MOBILITY_WEIGHT = 30;
 const CORNER_WEIGHT = 25;
 const STABILITY_WEIGHT = 30;
 
+// row, col, line start direction, line direction.
+const CORNERS = [
+    [0,                    0,                    [ 0,  1],  [1,  0]],
+    [0,                    othello.BOARD_SIZE-1, [ 1,  0],  [0, -1]],
+    [othello.BOARD_SIZE-1, othello.BOARD_SIZE-1, [ 0, -1], [-1,  0]],
+    [othello.BOARD_SIZE-1, 0,                    [-1,  0], [ 0,  1]],
+];
+
 const STABLE_ORDER_GRID = [
     [ 0,  4, 12, 24, 29, 17,  9,  1],
     [ 8, 20, 32, 40, 45, 37, 21,  5],
@@ -18,6 +26,13 @@ const STABLE_ORDER_GRID = [
     [ 7, 23, 39, 47, 42, 34, 22, 10],
     [ 3, 11, 19, 31, 26, 14,  6,  2],
 ];
+const STABLE_ORDER = new Array(64);
+
+for (var row = 0; row < 8; row++) {
+    for (var col = 0; col < 8; col++) {
+        STABLE_ORDER[STABLE_ORDER_GRID[row][col]] = [row, col]; 
+    }
+}
 
 class AiBoard extends othello.Board
 {
@@ -54,12 +69,12 @@ class AiBoard extends othello.Board
             return new AiBoard(pieces, move, this.maxColor, this.minColor);
         }
 
-        throw console.error("oops");        
+        throw console.error("oops");
     }
 
     getHeuristic() {
-        var maxParity = countCoins(this.pieces, this.maxColor)
-        var minParity = countCoins(this.pieces, this.minColor)
+        var maxParity = this.countCoins(this.maxColor)
+        var minParity = this.countCoins(this.minColor)
         var parity = 100 * (maxParity - minParity) / (maxParity + minParity)
     
         var maxMobility = this.validMoves[this.maxColor].length;
@@ -67,20 +82,20 @@ class AiBoard extends othello.Board
         var mobility = 0;
         if (maxMobility + minMobility == 0) {
             // Games over. 
-            return maxParity > minParity ? Infinity : -Infinity;
+            return [maxParity > minParity ? Infinity : -Infinity];
         } else {
             mobility = 100 * (maxMobility - minMobility) / (maxMobility + minMobility)
         }
         
-        var maxCorner = countCorners(this.pieces, this.validMoves[this.maxColor], this.maxColor)
-        var minCorner = countCorners(this.pieces, this.validMoves[this.minColor], this.minColor)
+        var maxCorner = this.countCorners(this.maxColor)
+        var minCorner = this.countCorners(this.minColor)
         var corner = 0
         if (maxCorner + minCorner != 0) {
             corner = 100 * (maxCorner - minCorner) / (maxCorner + minCorner)
         }
     
-        var maxStable = countStable(this.pieces, this.maxColor)
-        var minStable = countStable(this.pieces, this.minColor)
+        var maxStable = this.countStable(this.maxColor)
+        var minStable = this.countStable(this.minColor)
         var stable = 0
         if (maxStable + minStable != 0) {
             stable = 100 * (maxStable - minStable) / (maxStable + minStable)
@@ -117,98 +132,82 @@ class AiBoard extends othello.Board
             corner,
             stable];
     }
-}
-const STABLE_ORDER = new Array(64);
 
-for (var row = 0; row < 8; row++) {
-    for (var col = 0; col < 8; col++) {
-        STABLE_ORDER[STABLE_ORDER_GRID[row][col]] = [row, col]; 
-    }
-}
-
-// row, col, line start direction, line direction.
-const corners = [
-    [0,                    0,                    [ 0,  1],  [1,  0]],
-    [0,                    othello.BOARD_SIZE-1, [ 1,  0],  [0, -1]],
-    [othello.BOARD_SIZE-1, othello.BOARD_SIZE-1, [ 0, -1], [-1,  0]],
-    [othello.BOARD_SIZE-1, 0,                    [-1,  0], [ 0,  1]],
-];
-
-function countCoins(pieces, color) {
-    var coins = 0;
-
-    for (var row = 0; row < othello.BOARD_SIZE; row++) {
-        for (var col = 0; col < othello.BOARD_SIZE; col++) {
-            if (pieces[row][col] === color) {
-                coins += 1;
+    countCoins(color) {
+        var coins = 0;
+    
+        for (var row = 0; row < othello.BOARD_SIZE; row++) {
+            for (var col = 0; col < othello.BOARD_SIZE; col++) {
+                if (this.pieces[row][col] === color) {
+                    coins += 1;
+                }
             }
         }
+    
+        return coins;
     }
 
-    return coins;
-}
+    countCorners(color) {
+        var cornerScore = 0;
+        CORNERS.forEach(corner => {
+            if (this.pieces[corner[0]][corner[1]] === color) {
+                cornerScore += 2
+            }
+            if (this.validMoves[color].some(validMove => corner[0] == validMove[0] && corner[1] == validMove[1])) {
+                cornerScore += 1
+            }
+        })
+        return cornerScore;
+    }
+    
+    countStable(color) {
+        var stability = othello.getEmptyBoard();
 
-function countCorners(pieces, validMoves, color) {
-    var cornerScore = 0;
-    corners.forEach(corner => {
-        if (pieces[corner[0]][corner[1]] === color) {
-            cornerScore += 2
-        }
-        if (validMoves.some(validMove => corner[0] == validMove[0] && corner[1] == validMove[1])) {
-            cornerScore += 1
-        }
-    })
-    return cornerScore;
-}
+        CORNERS.forEach(corner => {
+            var lineStartRow = corner[0];
+            var lineStartCol = corner[1];
+            var lineStartDir = corner[2];
+            var lineDir = corner[3];
 
-function countStable(pieces, color) {
-    var stability = new Array(othello.BOARD_SIZE).fill(0).map(() => new Array(othello.BOARD_SIZE).fill(0));
+            while (othello.onBoard(lineStartRow, lineStartCol) &&
+                this.pieces[lineStartRow][lineStartCol] === color) {
+                
+                var lineRow = lineStartRow;
+                var lineCol = lineStartCol;
 
-    corners.forEach(corner => {
-        var lineStartRow = corner[0];
-        var lineStartCol = corner[1];
-        var lineStartDir = corner[2];
-        var lineDir = corner[3];
+                var first = true;
+                while (true) {
+                    var stableCheckRow = lineRow - lineStartDir[0] + (first ? 0 : lineDir[0]); 
+                    var stableCheckCol = lineCol - lineStartDir[1] + (first ? 0 : lineDir[1]); 
 
-        while (othello.onBoard(lineStartRow, lineStartCol) &&
-            pieces[lineStartRow][lineStartCol] === color) {
-            
-            var lineRow = lineStartRow;
-            var lineCol = lineStartCol;
+                    if (!othello.onBoard(lineRow, lineCol)
+                        || this.pieces[lineRow][lineCol] !== color
+                        || stability[lineRow][lineCol]
+                        || (othello.onBoard(stableCheckRow, stableCheckCol) && !stability[stableCheckRow][stableCheckCol]))
+                    {
+                        break;
+                    }
 
-            var first = true;
-            while (true) {
-                var stableCheckRow = lineRow - lineStartDir[0] + (first ? 0 : lineDir[0]); 
-                var stableCheckCol = lineCol - lineStartDir[1] + (first ? 0 : lineDir[1]); 
+                    stability[lineRow][lineCol] = 1;
 
-                if (!othello.onBoard(lineRow, lineCol)
-                    || pieces[lineRow][lineCol] !== color
-                    || stability[lineRow][lineCol]
-                    || (othello.onBoard(stableCheckRow, stableCheckCol) && !stability[stableCheckRow][stableCheckCol]))
-                {
-                    break;
+                    lineRow += lineDir[0];
+                    lineCol += lineDir[1];
                 }
 
-                stability[lineRow][lineCol] = 1;
-
-                lineRow += lineDir[0];
-                lineCol += lineDir[1];
+                lineStartRow += lineStartDir[0];
+                lineStartCol += lineStartDir[1];
             }
+        })
 
-            lineStartRow += lineStartDir[0];
-            lineStartCol += lineStartDir[1];
+        var stableSum = 0;
+        for (var row = 0; row < othello.BOARD_SIZE; row++) {
+            for (var col = 0; col < othello.BOARD_SIZE; col++) {
+                stableSum += stability[row][col];
+            }
         }
-    })
-
-    var stableSum = 0;
-    for (var row = 0; row < othello.BOARD_SIZE; row++) {
-        for (var col = 0; col < othello.BOARD_SIZE; col++) {
-            stableSum += stability[row][col];
-        }
+        return stableSum;
     }
-    return stableSum;
 }
-
 
 function minimax(board, depth) {
     // mayberework so pass skips a depth?
