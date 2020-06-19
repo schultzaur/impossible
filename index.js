@@ -63,9 +63,15 @@ async function doStuff() {
         return cStr;
     }
 
-    for(var i = 0; i < 64; i++) {
+    for(var i = 0; i < 64; i+=6) {
         document.body.appendChild(component(("0" + i).slice(-2) + "|" + doBitBoardThings("0x0", b, 0, i)));
     }
+
+
+    const { dateTest } = myModule.exports;
+    var ad = Date.now();
+    document.body.appendChild(component(dateTest()));
+    console.log(Date.now()-ad);
 }
 
 function component(s) {
