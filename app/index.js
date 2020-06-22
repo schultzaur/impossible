@@ -82,27 +82,27 @@ loadModule()
         document.body.appendChild(component(doLsh(b, 2)));
         document.body.appendChild(component(doRsh(b, 2)));
     
-        const { BitBoard, getBitBoard } = myModule.exports;
+        const { Board, } = myModule.exports;
         
-        function doBitBoardThings(aStr, bStr, color, move) {
+        function doBoardThings(aStr, color, move) {
             let aPtr = __retain(__allocString(aStr));
-            let bPtr = __retain(__allocString(bStr));
-            let bbPtr = getBitBoard(aPtr, bPtr);
-            let bb = BitBoard.wrap(bbPtr);
-            let bb2Ptr = bb.move(color, move);
-            let bb2 = BitBoard.wrap(bb2Ptr);
-            let cPtr = bb2.getPieces();
+            let bPtr = Board.fromString(aPtr)
+            let b = Board.wrap(bPtr);
+            let b2Ptr = b.move(color, move);
+            let b2 = Board.wrap(b2Ptr);
+            let cPtr = b2.toString();
             let cStr = __getString(cPtr);
             __release(aPtr);
             __release(bPtr);
-            __release(bbPtr);
-            __release(bb2Ptr);
+            __release(b2Ptr);
             __release(cPtr);
             return cStr;
         }
 
+        let board = "BW" + "-".repeat(60) + "WB";
         for(var i = 0; i < 64; i+=6) {
-            document.body.appendChild(component(("0" + i).slice(-2) + "|" + doBitBoardThings("0x0", b, 0, i)));
+            document.body.appendChild(
+                component(("0" + i).slice(-2) + "|" + doBoardThings(board, 0, i)));
         }
 
         return myModule;
