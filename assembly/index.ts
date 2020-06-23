@@ -1,18 +1,19 @@
-// The entry file of your WebAssembly module.
-import { toString, parseInt } from "./utils"
-import { Board } from "./board";
-export { Board } from "./board";
+import { Board } from "./Board"
+import { AiBoard, minimax } from "./ai"
+import { oppositeColor } from "./utils";
 
-export function xor(aStr: string, bStr: string): string {
-  return toString((parseInt(aStr) ^ parseInt(bStr)));
+export function doMove(piecesStr: string, active: i8, square: i8): string {
+    let board: Board = Board.fromString(piecesStr);
+    let newBoard = new Board(board.move(active, square));
+    return newBoard.toString();
 }
 
-export function lsh(a: string, b: i32): string {
-  return toString(parseInt(a) << b);
-}
-
-export function and(a: string): string {
-  return toString(parseInt(a) & 0x7E7E7E7E7E7E7E7E);
+export function findBestMove(piecesStr: string, maxColor: i8): i8 {
+  let board: Board = Board.fromString(piecesStr);
+  var minColor = oppositeColor(maxColor);
+  var aiBoard = new AiBoard(board.pieces, -1, maxColor, minColor);
+  var mm = minimax(aiBoard, 0);
+  return mm.move;
 }
 
 export function dateTest(): i32 {
@@ -30,8 +31,4 @@ export function dateTest(): i32 {
   }
   
   return i;
-}
-
-export function boardFromString(a: string): Board {
-  return Board.fromString(a);
 }

@@ -1,25 +1,17 @@
 import { BitBoard } from "./bitboard";
 import { DIRECTIONS, NUM_SQUARES, EMPTY_CHAR, BLACK_CHAR, BLACK, EMPTY, WHITE_CHAR, WHITE, } from "./constants";
-import { oppositeColor, toString } from "./utils";
+import { oppositeColor, toString, } from "./utils";
 
 export class Board {
     pieces: StaticArray<i8>;
     bitBoard: BitBoard;
-    heuristic: f64;
   
     constructor(pieces: StaticArray<i8>) {
         this.pieces = pieces;
         this.bitBoard = new BitBoard(pieces);
-        this.heuristic = 0;
-        this.setHeuristic();
-    }
-
-    setHeuristic(): void {
-        // TODO
-        this.heuristic = 0;
     }
   
-    move(active: i8, square: u8): Board {
+    move(active: i8, square: u8): StaticArray<i8> {
         let newPieces: StaticArray<i8> = StaticArray.slice(this.pieces);
         
         let mask: u64 = 1 << square;
@@ -32,8 +24,8 @@ export class Board {
                 Board.directionalMove(newPieces, active, opposite, square, DIRECTIONS[d]);
             }
         }
-        
-        return new Board(newPieces);
+
+        return newPieces;
     }
 
     static directionalMove(pieces: StaticArray<i8>, active: i8, opposite: i8, square: i8, direction: i8): void {
@@ -56,6 +48,10 @@ export class Board {
                 moveSquare += direction;
             }
         }
+    }
+
+    static fromString(piecesStr: string): Board {
+        return new Board(piecesFromString(piecesStr))
     }
 
     toString(): string {
@@ -102,21 +98,20 @@ export class Board {
 
         return movesStr + toString(this.bitBoard.pieces[active]);
     }
-  
-    // -WB-BW-B 
-    static fromString(piecesStr: string): Board {
-        let pieces = new StaticArray<i8>(64);
+}
 
-        for (let square: i8 = 0; square < NUM_SQUARES; square++) {
-            if (piecesStr.charAt(square) == BLACK_CHAR) {
-                pieces[square] = BLACK;
-            } else if (piecesStr.charAt(square) == WHITE_CHAR) {
-                pieces[square] = WHITE;
-            } else {
-                pieces[square] = EMPTY;
-            }
+export function piecesFromString(piecesStr: string): StaticArray<i8> {
+    let pieces = new StaticArray<i8>(64);
+
+    for (let square: i8 = 0; square < NUM_SQUARES; square++) {
+        if (piecesStr.charAt(square) == BLACK_CHAR) {
+            pieces[square] = BLACK;
+        } else if (piecesStr.charAt(square) == WHITE_CHAR) {
+            pieces[square] = WHITE;
+        } else {
+            pieces[square] = EMPTY;
         }
-
-        return new Board(pieces);
     }
+
+    return pieces;
 }

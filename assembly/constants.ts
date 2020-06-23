@@ -10,6 +10,7 @@ export const EMPTY_CHAR: string = '-';
 export const BLACK_CHAR: string = 'B';
 export const WHITE_CHAR: string = 'W';
 
+export const CORNER_MASK: u64 = 0x8000000180000001;
 // -9 -8 -7
 // -1  X  1
 //  7  8  9
