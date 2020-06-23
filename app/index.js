@@ -42,7 +42,7 @@ function component(s) {
 var imports = { env: { abort() {} }};
 loadModule()
     .then(myModule => {
-        const { xor, lsh, rsh } = myModule.exports;
+        const { xor, lsh, and } = myModule.exports;
         const { __allocString, __retain, __release, __getString } = myModule.exports;
     
         function doXor(aStr, bStr) {
@@ -65,13 +65,13 @@ loadModule()
             return cStr;
         }
     
-        function doRsh(aStr, b) {
+        function doAnd(aStr) {
             let aPtr = __retain(__allocString(aStr));
-            let cPtr = rsh(aPtr, b);
-            let cStr = __getString(cPtr);
+            let bPtr = and(aPtr);
+            let bStr = __getString(bPtr);
             __release(aPtr);
-            __release(cPtr);
-            return cStr;
+            __release(bPtr);
+            return bStr;
         }
     
         const a = "0xf000000000000001";
@@ -80,7 +80,7 @@ loadModule()
 
         document.body.appendChild(component(doXor(a, b)));
         document.body.appendChild(component(doLsh(b, 2)));
-        document.body.appendChild(component(doRsh(b, 2)));
+        document.body.appendChild(component(doAnd("0xFFFFFFFFFFFFFFFF")));
     
         const { Board, } = myModule.exports;
         
@@ -98,12 +98,32 @@ loadModule()
             __release(cPtr);
             return cStr;
         }
-
-        let board = "BW" + "-".repeat(60) + "WB";
-        for(var i = 0; i < 64; i+=6) {
-            document.body.appendChild(
-                component(("0" + i).slice(-2) + "|" + doBoardThings(board, 0, i)));
+        
+        function getBoardMoves(aStr, color) {
+            let aPtr = __retain(__allocString(aStr));
+            let bPtr = Board.fromString(aPtr)
+            let b = Board.wrap(bPtr);
+            let cPtr = b.toMoves(color);
+            let cStr = __getString(cPtr);
+            __release(aPtr);
+            __release(bPtr);
+            __release(cPtr);
+            return cStr;
         }
+
+        let board =
+            "--------" +
+            "--------" +
+            "---B----" +
+            "---BBW--" +
+            "--BBWWW-" +
+            "--BWWW--" +
+            "--B-----" +
+            "--------";
+        document.body.appendChild(component(doBoardThings(board, 0, 52)));
+        document.body.appendChild(component(doBoardThings(board, 1, 26)));
+        document.body.appendChild(component(getBoardMoves(board, 0)));
+        document.body.appendChild(component(getBoardMoves(board, 1)));
 
         return myModule;
     }).then(myModule => {

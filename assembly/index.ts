@@ -11,8 +11,8 @@ export function lsh(a: string, b: i32): string {
   return toString(parseInt(a) << b);
 }
 
-export function rsh(a: string, b: i32): string {
-  return toString(parseInt(a) >> b);
+export function and(a: string): string {
+  return toString(parseInt(a) & 0x7E7E7E7E7E7E7E7E);
 }
 
 export function dateTest(): i32 {
