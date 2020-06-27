@@ -1,10 +1,11 @@
+import * as othello from "./othello";
 
-const Players = {
+export const Players = {
     Player: 1,
     CPU: 2,
 }
 
-class Game {
+export class Game {
     constructor(board, playerColor, turnColor, lastMove) {
         this.board = (typeof board !== 'undefined') ? board : new othello.Board();
         this.player = (typeof playerColor !== 'undefined') ? playerColor : othello.Colors.Black;

@@ -1,7 +1,7 @@
+import "./main.css";
+
 const loader = require("@assemblyscript/loader");
-
-export { loadApp } from "./components"
-
+    
 var doMove;
 var loadWorker;
 
@@ -87,3 +87,7 @@ loadModule()
             worker.postMessage({ messageType: "doBestMove", pieces: board, active: 1});   
         }
     });
+
+import Game from "./vue/Game.vue";
+var app = new Vue({el: '#app', components: { Game }});
+    
