@@ -1,5 +1,7 @@
 import Game from "./vue/Game.vue";
 import "./main.css";
+import * as othello from "./othello";
+import { Board } from "../docs/renegade/othello";
 
 const loader = require("@assemblyscript/loader");
 const wasmPath = './asm/optimized.wasm';
@@ -37,15 +39,25 @@ async function loadModule() {
     });
 
     const othelloWasm = await loader.instantiate(compiled, imports);
-    const { __allocString, __retain, __release, __getString, _doMove } = othelloWasm.exports;
+    const { __allocString, __retain, __release, __getString,
+            _doMove, } = othelloWasm.exports;
     
-    doMove = function(pieces, active, square) {
+    doMove = function(game, move) {
+        let pieces = game.toString();
+        let active = game.turn;
+        let square = othello.getIndex(move.row, move.col);
+
         let piecesPtr = __retain(__allocString(pieces));
         let newBoardPtr = _doMove(piecesPtr, active, square);
         let newBoard = __getString(newBoardPtr);
         __release(newBoardPtr);
-        __release(piecesPtr);    
-        return newBoard;
+        __release(piecesPtr);
+
+        if (newBoard == ":(") {
+            return null;
+        }
+        
+        return othello.Game.parseBoard(newBoard, game.player);
     }
 
     return initWorker;
@@ -77,12 +89,6 @@ async function getBestMove(board, active) {
     return bestMovePromise;
 }
 
-function addComponent(text) {
-    const element = document.createElement('p');
-    element.innerHTML = text;
-    document.body.appendChild(element);
-}
-
 let board =
     "--------" +
     "--------" +
@@ -98,7 +104,7 @@ loadModule()
         new Vue({
             el: '#app',
             components: { Game },
-            methods: { getBestMove }
+            methods: { doMove, getBestMove }
         });
     });
 

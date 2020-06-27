@@ -1,7 +1,7 @@
 {
-  "extends": "assemblyscript/std/assembly.json",
-  "include": [
-    "./**/*.ts"
-  ],
-  "outDir": "./dist"
+    "extends": "assemblyscript/std/assembly.json",
+    "include": [
+        "./**/*.ts"
+    ],
+    "outDir": "./dist"
 }

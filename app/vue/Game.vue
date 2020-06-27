@@ -27,33 +27,31 @@
 <script>
 import Board from "./Board.vue"
 import * as othello from "../othello";
-import { Game, Players } from "../game"
 
 export default {
     name: "game",
     props: {
-        getBestMove: {
-            type: Function
-        }
+        doMove: { type: Function },
+        getBestMove: { type: Function },
     },
     components: { Board },
     computed: {},
     data() {
         var urlParams = new URLSearchParams(window.location.search);
-        var gameState = Game.fromGameLink(urlParams);
+        var gameState = othello.Game.fromGameLink(urlParams);
 
         return {
             gameStates: [gameState],
             gameState: gameState,
-            first: gameState.player == othello.Colors.Black ? Players.Player : Players.CPU,
+            first: gameState.player == othello.Colors.Black ? othello.Players.Player : othello.Players.CPU,
         };
     },
     computed: {
         player : function() {
-            return Players.Player;
+            return othello.Players.Player;
         },
         cpu: function() {
-            return Players.CPU;
+            return othello.Players.CPU;
         },
         gameLink: function() {
             return this.gameState.getGameLink();
@@ -66,7 +64,7 @@ export default {
             var newGame = this.move(move);
 
             while (newGame && newGame.turn == oppositeTurn) {
-                var cpu_move = await this.getBestMove(this.gameState.board.toString(), this.gameState.turn);
+                var cpu_move = await this.getBestMove(this.gameState.toString(), this.gameState.turn);
                 if (cpu_move != -1) {
                     newGame = this.move({ row: Math.floor(cpu_move / 8), col: cpu_move % 8 });                   
                 }
@@ -75,7 +73,7 @@ export default {
             return Promise.resolve();
         },
         move(move) {
-            var newGameState = this.gameState.move(move.row, move.col);
+            var newGameState = this.doMove(this.gameState, move);
             if (newGameState) {
                 this.gameStates.push(newGameState);
                 this.gameState = this.gameStates[this.gameStates.length-1];
@@ -83,10 +81,10 @@ export default {
             return newGameState;
         },
         newGame() {
-            this.gameStates.push(new Game());
+            this.gameStates.push(othello.Game.getNewGame());
             this.gameState = this.gameStates[this.gameStates.length-1];
 
-            if (this.first === Players.CPU) {
+            if (this.first === othello.Players.CPU) {
                 var middle = Math.floor(othello.BOARD_SIZE/2) - 1;
                 this.move({ row: middle-1, col: middle});
             }

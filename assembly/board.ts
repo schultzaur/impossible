@@ -17,8 +17,17 @@ export class Board {
   
     move(active: i8, square: u8): StaticArray<i8> {
         let newPieces: StaticArray<i8> = StaticArray.slice(this.pieces);
+
+        if (active == EMPTY && square == -1) {
+            return newPieces;
+        }
         
         let mask: u64 = 1 << square;
+
+        if (!(this.bitBoard.moves[active] & mask)) {
+            return new StaticArray<i8>(0);
+        }
+
         let opposite: i8 = oppositeColor(active);
 
         newPieces[square] = active;

@@ -5,7 +5,13 @@ import { AiBoard } from "./ai";
 
 export function doMove(piecesStr: string, active: i8, square: i8): string {
     let board: Board = new Board(piecesFromString(piecesStr), -1);
-    let newBoard = new Board(board.move(active, square), square);
+    let newPieces: StaticArray<i8> = board.move(active, square);
+
+    if (newPieces.length != 64) {
+        return ":(";
+    }
+
+    let newBoard = new Board(newPieces, square);
     return formatBoard(newBoard);
 }
 
@@ -22,6 +28,11 @@ export function getBestMove(piecesStr: string, active: i8): i8 {
     return aiBoard.getBestMove();
 }
 
+export function getValidMoves(piecesStr: string, active: i8): string {
+    let board: Board = new Board(piecesFromString(piecesStr), -1);
+    return formatBoard(board);
+}
+
 function formatBoard(board: Board): string {
     let result: string = board.active.toString()
         + "|" + board.lastMove.toString()
@@ -35,7 +46,7 @@ function formatBoard(board: Board): string {
 }
 
 function formatMoves(moves: u64): string {
-    return "0".repeat(64) + moves.toString(2).slice(-64);
+    return ("0".repeat(64) + moves.toString(2)).slice(-64);
 }
 
 function piecesToString(pieces: StaticArray<i8>): string {

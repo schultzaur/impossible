@@ -1,4 +1,11 @@
+import { Board } from "../docs/renegade/othello";
+
 export const BOARD_SIZE = 8;
+
+export const Players = {
+    Player: 1,
+    CPU: 2,
+}
 
 export const Colors = {
     Black: 0,
@@ -6,103 +13,167 @@ export const Colors = {
     None: 2,
 }
 
-export function getEmptyBoard() {
+const BLACK_CHAR = "B";
+const WHITE_CHAR = "W";
+const EMPTY_CHAR = "-";
+
+const newGameStr =
+    "0"
+    + "|-1"
+    + "|---------------------------WB------BW---------------------------"
+    + "|0000000000000000000100000010000000000100000010000000000000000000"
+    + "|0000000000000000000010000000010000100000000100000000000000000000";
+
+
+function getEmptyBoard() {
     return new Array(BOARD_SIZE).fill(0).map(() => new Array(BOARD_SIZE).fill(Colors.None));
 }
 
-export function getNewPieces() {
-    var pieces = getEmptyBoard();
+function parseActive(a) {
+    switch(a) {
+        case "0":
+            return Colors.Black;
+        case "1":
+            return Colors.White;
+        case "-1":
+        default:
+            return Colors.None;
+    }
+}
 
-    var middle = Math.floor(BOARD_SIZE/2) - 1;
+function toActive(a) {
+    switch(a) {
+        case Colors.Black:
+            return "0";
+        case Colors.White:
+            return "1";
+        case Colors.None:
+        default:
+            return "-1";
+    }
+}
 
-    pieces[middle  ][middle  ] = Colors.White;
-    pieces[middle  ][middle+1] = Colors.Black;
-    pieces[middle+1][middle  ] = Colors.Black;
-    pieces[middle+1][middle+1] = Colors.White;
+function parseLastMove(m) {
+    let square = parseInt(m);
+
+    if (square == -1) {
+        return [-1, -1];
+    }
+
+    return [Math.floor(square / BOARD_SIZE), square % BOARD_SIZE];
+}
+
+function toLastMove(m) {
+    return getIndex(m[0], m[1]).toString();
+}
+
+function parsePieces(s) {
+    let pieces = getEmptyBoard();
+
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            switch(s.charAt(getIndex(row, col))) {
+                case BLACK_CHAR:
+                    pieces[row][col] = Colors.Black;
+                    break;
+                case WHITE_CHAR:
+                    pieces[row][col] = Colors.White;
+                    break;
+            }
+        }
+    }
 
     return pieces;
 }
 
-export function getOppositeColor(color) {
-    return color === Colors.White ? Colors.Black : Colors.White;
-}
-
-export function getIndex(row, col) {
-    return row * BOARD_SIZE + col;
-}
-
-export function getRowCol(index) {
-    return [Math.floor(index / BOARD_SIZE), index % BOARD_SIZE];
-}
-
-export function onBoard(row, col) {
-    return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
-}
-
-const directions = [
-    [-1,-1],
-    [-1, 0],
-    [-1, 1],
-    [ 0,-1],
-    [ 0, 1],
-    [ 1,-1],
-    [ 1, 0],
-    [ 1, 1],
-];
-
-export function isValidCaptureDirection(pieces, row, col, direction, color, oppositeColor) {
-    var pieceCaptured = false;
-
-    var capRow = row + direction[0];
-    var capCol = col + direction[1];
-
-    while (onBoard(capRow, capCol)) {
-        if (pieces[capRow][capCol] === oppositeColor) {
-            pieceCaptured = true;
-        } else {
-            break;
-        }
-
-        capRow += direction[0];
-        capCol += direction[1];
-    }
-
-    return pieceCaptured && onBoard(capRow, capCol) && pieces[capRow][capCol] === color;
-}
-
-export function getValidMoves(pieces, color) {
-    var validMoves = new Array();
-
-    for (var row = 0; row < 8; row++) {
-        for (var col = 0; col < 8; col++) {
-            if (isValidMove(pieces, row, col, color)) {
-                validMoves.push([row, col]);
+function toPieces(pieces) {
+    let s = "";
+    
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            switch(pieces[row][col]) {
+                case Colors.Black:
+                    s += BLACK_CHAR;
+                    break;
+                case Colors.White:
+                    s += WHITE_CHAR;
+                    break;
+                case Colors.None:
+                default:
+                    s += EMPTY_CHAR;
+                    break;
             }
         }
     }
-   
-    return validMoves;
+
+    return s;
 }
 
+function parseMoves(s, c) {
+    let moves = getEmptyBoard();
 
-export function isValidMove(pieces, row, col, color) {
-    if (!onBoard(row, col) || pieces[row][col] != Colors.None) {
-        return false;
+    // TODO - reverse the flip (?)
+    
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (s.charAt(63-getIndex(row, col)) == "1") {
+                moves[row][col] = c;
+            }
+        }
+    }
+
+    return moves
+}
+
+function toMoves(moves) {
+    let s = "";
+    
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            switch(moves[row][col]) {
+                case Colors.Black:
+                    s += "1";
+                    break;
+                case Colors.White:
+                    s += "1";
+                    break;
+                case Colors.None:
+                default:
+                    s += "0";
+                    break;
+            }
+        }
+    }
+
+    return s;
+}
+
+export class Game {
+    constructor(pieces, validMoves, playerColor, turnColor, lastMove) {
+        this.pieces = pieces;
+        this.validMoves = validMoves;
+        this.player = playerColor;
+        this.turn = turnColor;
+        this.lastMove = lastMove;
+    }
+
+    static getNewGame(p) {
+        return Game.parseBoard(newGameStr, p);
     }
     
-    var oppositeColor = getOppositeColor(color);
-
-    return directions.some(direction => isValidCaptureDirection(pieces, row, col, direction, color, oppositeColor));
-}
-
-
-export class Board {
-    constructor (pieces) {
-        this.pieces = (typeof pieces !== 'undefined') ? pieces : getNewPieces();
-        this.validMoves = {
-            [Colors.White]: getValidMoves(this.pieces, Colors.White),
-            [Colors.Black]: getValidMoves(this.pieces, Colors.Black),
-        };
+    static parseBoard(b, p) {
+        let tokens = b.split("|");
+        
+        return new Game(
+            parsePieces(tokens[2]),
+            {
+                [Colors.Black]: parseMoves(tokens[3], Colors.Black),
+                [Colors.White]: parseMoves(tokens[4], Colors.White),
+            },
+            p,
+            parseActive(tokens[0]),
+            parseLastMove(tokens[1])
+        );
     }
 
     toString() {
@@ -123,42 +194,43 @@ export class Board {
         return s;        
     }
 
-    copyPieces() {
-        var newPieces = new Array(BOARD_SIZE);
-
-        for (var row = 0; row < 8; row++) {
-            newPieces[row] = new Array(BOARD_SIZE);
-            for (var col = 0; col < 8; col++) {
-                newPieces[row][col] = this.pieces[row][col];
-            }
+    getGameLink() {
+        var path;
+        if (document.baseURI.indexOf("127.0.0.1") > -1) {
+            path = "./renegade.html";
+        } else {
+            path = "./renegade";
         }
 
-        return newPieces;
+        let board = `${toActive(this.active)}|${toLastMove(this.lastMove)}|${toPieces(this.pieces)}`
+            + `|${toMoves(this.validMoves[Colors.Black])}|${toMoves(this.validMoves[Colors.Black])}`;
+
+        path += `?board=${board}&player=${this.player}`
+
+        return new URL(path, document.baseURI).href;
     }
 
-    move(row, col, color, oppositeColor) {
-        var pieceCaptured = false;
-        var newPieces = this.copyPieces();
-        
-        directions.forEach(direction => {
-            if (isValidCaptureDirection(newPieces, row, col, direction, color, oppositeColor)) {
-                pieceCaptured = true;
-                var capRow = row + direction[0];
-                var capCol = col + direction[1];
+    static fromGameLink(urlParams) {
+        try {
+            var board = urlParams.get('board');
+            var player = JSON.parse(urlParams.get('player'));
 
-                while (onBoard(capRow, capCol) && newPieces[capRow][capCol] !== color) {
-                    newPieces[capRow][capCol] = color
-                    capRow += direction[0];
-                    capCol += direction[1];
-                }
+            if (board && player) {
+                return Game.parseBoard(board, player);
             }
-        })
-        
-        if (pieceCaptured) {
-            newPieces[row][col] = color;
-            return newPieces;
         }
-
-        return false;
+        catch (error) {
+            console.log(error);
+        }
+        
+        return Game.getNewGame();
     }
+}
+
+export function getOppositeColor(color) {
+    return color === Colors.White ? Colors.Black : Colors.White;
+}
+
+export function getIndex(row, col) {
+    return row * BOARD_SIZE + col;
 }

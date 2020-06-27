@@ -27,10 +27,10 @@ export default {
             }
         },
         piece: function() {
-            return this.gameState.board.pieces[this.row][this.col];
+            return this.gameState.pieces[this.row][this.col];
         },
         validMove: function() {
-            return this.gameState.validMovesBoard[this.row][this.col];
+            return this.gameState.validMoves[this.gameState.turn][this.row][this.col];
         },
         pieceColor: function () {
             if (this.piece === othello.Colors.Black || this.validMove == othello.Colors.Black) {
