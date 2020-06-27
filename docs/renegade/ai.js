@@ -161,6 +161,7 @@ class AiBoard extends othello.Board
     }
     
     countStable(color) {
+        return 0;
         var stability = othello.getEmptyBoard();
 
         CORNERS.forEach(corner => {

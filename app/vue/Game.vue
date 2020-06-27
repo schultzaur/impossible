@@ -60,17 +60,19 @@ export default {
         }
     },
     methods: {
-        clicked(move) {
+        async clicked(move) {
             var oppositeTurn = othello.getOppositeColor(this.gameState.turn);
 
             var newGame = this.move(move);
 
             while (newGame && newGame.turn == oppositeTurn) {
-                var cpu_move = this.getBestMove(this.gameState.board, this.gameState.turn);
+                var cpu_move = await this.getBestMove(this.gameState.board.toString(), this.gameState.turn);
                 if (cpu_move != -1) {
                     newGame = this.move({ row: Math.floor(cpu_move / 8), col: cpu_move % 8 });                   
                 }
             }
+            
+            return Promise.resolve();
         },
         move(move) {
             var newGameState = this.gameState.move(move.row, move.col);

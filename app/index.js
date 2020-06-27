@@ -1,7 +1,8 @@
+import Game from "./vue/Game.vue";
 import "./main.css";
 
 const loader = require("@assemblyscript/loader");
-const wasmPath = './asm/untouched.wasm';
+const wasmPath = './asm/optimized.wasm';
 
 let doMove;
 
@@ -12,6 +13,7 @@ let rejects = {};
 let worker = new Worker('worker.js');
 worker.onmessage = function(e) {
     console.log(`${e.data.messageType} processed in ${e.data.timeTaken}ms: ${e.data.result}`)
+
     resolves[e.data.id](e.data.result);
     // TODO: Figure out what to actually do here.
 
@@ -92,25 +94,12 @@ let board =
     "--------";
 
 loadModule()
-    .then(async _ => {
-        worker.postMessage({ messageType: "timeTest" });
-
-        const start = Date.now();
-        let newBoard;
-        for (let i = 0; i < 50; i++) {
-            newBoard = doMove(board, 0, 52);
-            newBoard = doMove(board, 1, 26);
-        }
-        addComponent(`Moved 100x in: ${Date.now() - start}`);
-
-        addComponent(await getBestMove(board, 0));
-        addComponent(await doBestMove(board, 1));
+    .then(_ => {
+        new Vue({
+            el: '#app',
+            components: { Game },
+            methods: { getBestMove }
+        });
     });
 
-import Game from "./vue/Game.vue";
-const app = new Vue({
-    el: '#app',
-    components: { Game },
-    methods: { getBestMove }
-});
     
