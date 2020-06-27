@@ -1,77 +1,89 @@
 const loader = require("@assemblyscript/loader");
 
-var loadResolve = null;
+export { loadApp } from "./components"
 
-var myWorker = new Worker('worker.js');
-myWorker.onmessage = function(e) {
+var doMove;
+var loadWorker;
+
+var worker = new Worker('worker.js');
+worker.onmessage = function(e) {
     switch(e.data.messageType)
     {
-        case "init":
-            if (loadResolve !== null) { loadResolve("Loaded!"); }
+        case "workerReady":
+            if (loadWorker.resolve !== null) {
+                loadWorker.resolve("Loaded!");
+                console.log("workerReady: Suceeded");
+            } else {
+                console.log("workerReady: Failed");
+            }
             break;
-        case "test":
-            document.body.appendChild(component(e.data.testData));
+        case "timeTest":
+            addComponent(`Did time test: ${e.data.timeTaken}ms`);
             break;
-        case "dateTest":
-            document.body.appendChild(component(e.data.testData));
-            break;
-        case "doMove":
-            document.body.appendChild(component(e.data.board));
-            break;
-        case "findBestMove":
-            document.body.appendChild(component(e.data.bestMove));
+        case "doBestMove":
+            addComponent(`Did best move in ${e.data.timeTaken}ms: ${e.data.newBoard}`);
             break;
     }
 }
 
 async function loadModule() {
-    var imports = { env: { abort() {} }};
+    const imports = { env: { abort() {} }};
     const response = await fetch('../build/untouched.wasm');
     const buffer = await response.arrayBuffer();
     const compiled = await WebAssembly.compile(buffer);
 
-    // myWorker.postMessage({ messageType: "init", wasmModule: compiled });
-    await new Promise(function (resolve, reject) {
-        loadResolve = resolve;
-        myWorker.postMessage({ messageType: "init", wasmModule: compiled });
+    const initWorker = new Promise(function (resolve, reject) {
+        loadWorker = { resolve, reject };
+
+        worker.postMessage({ messageType: "init", wasmModule: compiled });
     });
 
-    return await loader.instantiate(compiled, imports);
+    const othelloWasm = await loader.instantiate(compiled, imports);
+    const { __allocString, __retain, __release, __getString, _doMove } = othelloWasm.exports;
+    
+    doMove = function(pieces, active, square) {
+        let piecesPtr = __retain(__allocString(pieces));
+        let newBoardPtr = _doMove(piecesPtr, active, square);
+        let newBoard = __getString(newBoardPtr);
+        __release(newBoardPtr);
+        __release(piecesPtr);    
+        return newBoard;
+    }
+
+    return initWorker;
 }
 
-function component(s) {
-    const element = document.createElement('div');
-    element.innerHTML = s;
-    return element;
+function addComponent(text) {
+    const element = document.createElement('p');
+    element.innerHTML = text;
+    document.body.appendChild(element);
 }
 
-var imports = { env: { abort() {} }};
+let board =
+    "--------" +
+    "--------" +
+    "---B----" +
+    "---BBW--" +
+    "--BBWWW-" +
+    "--BWWW--" +
+    "--B-----" +
+    "--------";
+
 loadModule()
-    .then(myModule => {
-        myWorker.postMessage({ messageType: "test", testData: "hi2" });
-        return myModule;
-    }).then(myModule => {
-        // should not block, can click checkmark.
-        myWorker.postMessage({ messageType: "dateTest", testData: "hi" });
-        return myModule;
-    }).then(myModule => {
-        let board =
-            "--------" +
-            "--------" +
-            "---B----" +
-            "---BBW--" +
-            "--BBWWW-" +
-            "--BWWW--" +
-            "--B-----" +
-            "--------";
+    .then(_ => {
+        worker.postMessage({ messageType: "timeTest" });
 
-        let move = { pieces: board, active: 0, square: 52 }
-        myWorker.postMessage({ messageType: "doMove", move: move });
-        myWorker.postMessage({ messageType: "findBestMove", move: move });
+        const start = Date.now();
+        let newBoard;
+        for (let i = 0; i < 50; i++) {
+            newBoard = doMove(board, 0, 52);
+            newBoard = doMove(board, 1, 26);
+        }
+        addComponent(`Moved 100x in: ${Date.now() - start}`);
 
-        move = { pieces: board, active: 1, square: 26 }
-        myWorker.postMessage({ messageType: "doMove", move: move });
-        myWorker.postMessage({ messageType: "findBestMove", move: move });
+        worker.postMessage({ messageType: "doMove", pieces: board, active: 0, square: 52 });
 
-        return myModule;
+        for (let i = 0; i < 10; i++) {
+            worker.postMessage({ messageType: "doBestMove", pieces: board, active: 1});   
+        }
     });

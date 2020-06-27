@@ -253,11 +253,12 @@ function minimax(board, depth) {
 }
 
 export function findBestMove(board, maxColor) {
+    var start = Date.now();
     var minColor = othello.getOppositeColor(maxColor);
 
     var aiBoard = new AiBoard(board.pieces, [-1, -1], maxColor, minColor);
     var bestMove = minimax(aiBoard, 0);
 
-    console.log(bestMove);
+    console.log(`found: ${ bestMove } in ${Date.now() - start}ms`);
     return bestMove[1];
 }

@@ -40,38 +40,20 @@ for (var row = 0; row < 8; row++) {
 
 export class AiBoard extends Board
 {
-    lastMove: i8;
     maxColor: i8;
     minColor: i8;
     heuristic: f64;
-    active: i8;
 
     constructor(pieces: StaticArray<i8>, lastMove: i8, maxColor: i8, minColor: i8) {
-        super(pieces);
+        super(pieces, lastMove);
 
-        this.lastMove = lastMove;
-        this.maxColor = maxColor;
-        this.minColor = minColor;
-        this.heuristic = 0;
-        
-        if (lastMove != -1){
-            var lastPlayer = this.pieces[lastMove];
-            var oppositePlayer = oppositeColor(lastPlayer);
-
-            if (!this.bitBoard.moves[oppositePlayer]) {
-                if (this.bitBoard.moves[lastPlayer]) {
-                    this.active = lastPlayer;
-                } else {
-                    this.active = EMPTY;
-                }
-            } else {
-                this.active = oppositePlayer;
-            }
-        } else {
+        if (lastMove == -1) {
             this.active = maxColor;
         }
 
-        this.setHeuristic();
+        this.maxColor = maxColor;
+        this.minColor = minColor;
+        this.heuristic = this.getHeuristic();
     }
 
     aiMove(square: u8): AiBoard {
@@ -80,7 +62,11 @@ export class AiBoard extends Board
         return new AiBoard(pieces, square, this.maxColor, this.minColor);
     }
 
-    setHeuristic(): void {
+    doBestMove(): AiBoard {
+        return this.aiMove(minimax(this, 0).move);
+    }
+
+    getHeuristic(): f64 {
         var maxParity = this.countCoins(this.maxColor)
         var minParity = this.countCoins(this.minColor)
         var parity: f64 = 100 * (maxParity - minParity) / (maxParity + minParity)
@@ -134,8 +120,7 @@ export class AiBoard extends Board
             stabilityWeight = STABILITY_WEIGHT;
         }
     
-        this.heuristic = 
-            parityWeight * parity
+        return parityWeight * parity
                 + mobilityWeight * mobility
                 + cornerWeight * corner
                 + stabilityWeight * stable;
@@ -213,8 +198,10 @@ class MoveScore {
         this.move = move;
     }
 }
-export function minimax(board: AiBoard, depth: u8): MoveScore {
+
+function minimax(board: AiBoard, depth: u8): MoveScore {
     // maybe rework so pass skips a depth?
+    
     if (board.active == EMPTY || depth == DEPTH)
     {
         return new MoveScore(board.heuristic, board.lastMove);

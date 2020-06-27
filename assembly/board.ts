@@ -1,14 +1,18 @@
 import { BitBoard } from "./bitboard";
-import { DIRECTIONS, NUM_SQUARES, EMPTY_CHAR, BLACK_CHAR, BLACK, EMPTY, WHITE_CHAR, WHITE, } from "./constants";
-import { oppositeColor, toString, } from "./utils";
+import { DIRECTIONS, NUM_SQUARES, EMPTY, } from "./constants";
+import { oppositeColor, } from "./utils";
 
 export class Board {
     pieces: StaticArray<i8>;
     bitBoard: BitBoard;
+    lastMove: i8;
+    active: i8;
   
-    constructor(pieces: StaticArray<i8>) {
+    constructor(pieces: StaticArray<i8>, lastMove: i8) {
         this.pieces = pieces;
         this.bitBoard = new BitBoard(pieces);
+        this.lastMove = lastMove;
+        this.active = this.getActive(lastMove);
     }
   
     move(active: i8, square: u8): StaticArray<i8> {
@@ -26,6 +30,23 @@ export class Board {
         }
 
         return newPieces;
+    }
+
+    getActive(lastMove: i8): i8 {
+        if (lastMove == -1) {
+            return EMPTY;
+        }
+
+        let lastPlayer: i8 = this.pieces[lastMove];
+        let oppositePlayer: i8 = oppositeColor(lastPlayer);
+
+        if (this.bitBoard.moves[oppositePlayer]) {
+            return oppositePlayer;
+        } else if (this.bitBoard.moves[lastPlayer]) {
+            return lastPlayer;
+        } else {
+            return EMPTY;
+        }        
     }
 
     static directionalMove(pieces: StaticArray<i8>, active: i8, opposite: i8, square: i8, direction: i8): void {
@@ -49,69 +70,4 @@ export class Board {
             }
         }
     }
-
-    static fromString(piecesStr: string): Board {
-        return new Board(piecesFromString(piecesStr))
-    }
-
-    toString(): string {
-        let piecesStr: string = "";
-
-        for (let square: i8 = 0; square < NUM_SQUARES; square++) {
-            switch(this.pieces[square]) {
-                case BLACK:
-                    piecesStr += BLACK_CHAR;
-                    break;
-                case WHITE:
-                    piecesStr += WHITE_CHAR;
-                    break;
-                default:
-                    piecesStr += EMPTY_CHAR;
-                    break;
-            }
-
-            if (square % 8 == 7) {
-                piecesStr += " ";
-            }
-        }
-
-        return piecesStr;
-    }
-
-    toMoves(active: i8): string {
-        let movesStr: string = "";
-
-        let mask: u64 = 1;
-        for (let square: i8 = 0; square < NUM_SQUARES; square++) {
-            if (this.bitBoard.moves[active] & mask) {
-                movesStr += "X";
-            } else {
-                movesStr += "O";
-            }
-
-            if (square % 8 == 7) {
-                movesStr += " ";
-            }
-
-            mask <<= 1;
-        }
-
-        return movesStr + toString(this.bitBoard.pieces[active]);
-    }
-}
-
-export function piecesFromString(piecesStr: string): StaticArray<i8> {
-    let pieces = new StaticArray<i8>(64);
-
-    for (let square: i8 = 0; square < NUM_SQUARES; square++) {
-        if (piecesStr.charAt(square) == BLACK_CHAR) {
-            pieces[square] = BLACK;
-        } else if (piecesStr.charAt(square) == WHITE_CHAR) {
-            pieces[square] = WHITE;
-        } else {
-            pieces[square] = EMPTY;
-        }
-    }
-
-    return pieces;
 }

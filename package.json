@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/schultzaur/impossible#readme",
   "dependencies": {
-    "@assemblyscript/loader": "^0.10.1"
+    "@assemblyscript/loader": "^0.10.1",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "assemblyscript": "^0.12.3",

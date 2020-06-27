@@ -1,0 +1,48 @@
+
+.game {
+    text-align:center;
+}
+.board, .controls {
+    display: inline-block;
+    vertical-align: middle;
+}
+.controls {
+    text-align: left;
+}
+
+.controls > label, .controls > input {
+    margin-bottom: 0px;
+}
+
+.controls > button {
+    margin-bottom: 4px;
+}
+
+.gameLink {
+    margin-top: 4px;
+}
+
+.square {
+    background: var(--background, green);
+    border: 1px solid black;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    margin-right: -1;
+    margin-bottom: -1;
+}
+
+.square:hover {
+    background: var(--background-hover, yellowgreen);
+}
+
+.square > .piece {
+    background: none;
+    border-radius: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -1,22 +1,6 @@
-import { Board } from "./Board"
-import { AiBoard, minimax } from "./ai"
-import { oppositeColor } from "./utils";
+export { doMove as _doMove, doBestMove as _doBestMove } from "./interop"
 
-export function doMove(piecesStr: string, active: i8, square: i8): string {
-    let board: Board = Board.fromString(piecesStr);
-    let newBoard = new Board(board.move(active, square));
-    return newBoard.toString();
-}
-
-export function findBestMove(piecesStr: string, maxColor: i8): i8 {
-  let board: Board = Board.fromString(piecesStr);
-  var minColor = oppositeColor(maxColor);
-  var aiBoard = new AiBoard(board.pieces, -1, maxColor, minColor);
-  var mm = minimax(aiBoard, 0);
-  return mm.move;
-}
-
-export function dateTest(): i32 {
+export function _timeTest(): i32 {
   var a: i64 = Date.now();
   var c: u64 = 0;
 
