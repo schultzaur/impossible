@@ -66,6 +66,10 @@ export class AiBoard extends Board
         return this.aiMove(minimax(this, 0).move);
     }
 
+    getBestMove(): i8 {
+        return minimax(this, 0).move;
+    }
+
     getHeuristic(): f64 {
         var maxParity = this.countCoins(this.maxColor)
         var minParity = this.countCoins(this.minColor)

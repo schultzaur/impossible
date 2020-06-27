@@ -1,4 +1,4 @@
-export { doMove as _doMove, doBestMove as _doBestMove } from "./interop"
+export { doMove as _doMove, doBestMove as _doBestMove, getBestMove as _getBestMove } from "./interop"
 
 export function _timeTest(): i32 {
   var a: i64 = Date.now();

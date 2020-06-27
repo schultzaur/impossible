@@ -16,6 +16,12 @@ export function doBestMove(piecesStr: string, active: i8): string {
     return formatBoard(newBoard);
 }
 
+export function getBestMove(piecesStr: string, active: i8): i8 {
+    let pieces: StaticArray<i8> = piecesFromString(piecesStr);
+    var aiBoard = new AiBoard(pieces, -1, active, oppositeColor(active));
+    return aiBoard.getBestMove();
+}
+
 function formatBoard(board: Board): string {
     let result: string = board.active.toString()
         + "|" + board.lastMove.toString()

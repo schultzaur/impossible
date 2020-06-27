@@ -31,7 +31,11 @@ import { Game, Players } from "../game"
 
 export default {
     name: "game",
-    props: [],
+    props: {
+        getBestMove: {
+            type: Function
+        }
+    },
     components: { Board },
     computed: {},
     data() {
@@ -61,10 +65,12 @@ export default {
 
             var newGame = this.move(move);
 
-            // while (newGame && newGame.turn == oppositeTurn) {
-            //     var cpu_move = ai.findBestMove(this.gameState.board, this.gameState.turn);
-            //     newGame = this.move({ row: cpu_move[0], col: cpu_move[1] });
-            // }
+            while (newGame && newGame.turn == oppositeTurn) {
+                var cpu_move = this.getBestMove(this.gameState.board, this.gameState.turn);
+                if (cpu_move != -1) {
+                    newGame = this.move({ row: Math.floor(cpu_move / 8), col: cpu_move % 8 });                   
+                }
+            }
         },
         move(move) {
             var newGameState = this.gameState.move(move.row, move.col);

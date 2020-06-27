@@ -1,41 +1,37 @@
 import "./main.css";
 
 const loader = require("@assemblyscript/loader");
-    
-var doMove;
-var loadWorker;
+const wasmPath = './asm/untouched.wasm';
 
-var worker = new Worker('worker.js');
+let doMove;
+
+let msgId = 0;
+let resolves = {};
+let rejects = {};
+
+let worker = new Worker('worker.js');
 worker.onmessage = function(e) {
-    switch(e.data.messageType)
-    {
-        case "workerReady":
-            if (loadWorker.resolve !== null) {
-                loadWorker.resolve("Loaded!");
-                console.log("workerReady: Suceeded");
-            } else {
-                console.log("workerReady: Failed");
-            }
-            break;
-        case "timeTest":
-            addComponent(`Did time test: ${e.data.timeTaken}ms`);
-            break;
-        case "doBestMove":
-            addComponent(`Did best move in ${e.data.timeTaken}ms: ${e.data.newBoard}`);
-            break;
-    }
+    console.log(`${e.data.messageType} processed in ${e.data.timeTaken}ms: ${e.data.result}`)
+    resolves[e.data.id](e.data.result);
+    // TODO: Figure out what to actually do here.
+
+    delete resolves[e.data.id];
+    delete rejects[e.data.id];
 }
 
 async function loadModule() {
+    const id = msgId++;
+
     const imports = { env: { abort() {} }};
-    const response = await fetch('../build/untouched.wasm');
+    const response = await fetch(wasmPath);
     const buffer = await response.arrayBuffer();
     const compiled = await WebAssembly.compile(buffer);
 
     const initWorker = new Promise(function (resolve, reject) {
-        loadWorker = { resolve, reject };
+        resolves[id] = resolve;
+        rejects[id] = reject;
 
-        worker.postMessage({ messageType: "init", wasmModule: compiled });
+        worker.postMessage({ messageType: "init", id: id, wasmModule: compiled });
     });
 
     const othelloWasm = await loader.instantiate(compiled, imports);
@@ -51,6 +47,32 @@ async function loadModule() {
     }
 
     return initWorker;
+}
+
+async function doBestMove(board, active) {
+    const id = msgId++;
+
+    const bestMovePromise = new Promise(function (resolve, reject) {
+        resolves[id] = resolve;
+        rejects[id] = reject;
+
+        worker.postMessage({ messageType: "doBestMove", id: id, pieces: board, active: active});
+    });
+
+    return bestMovePromise;
+}
+
+async function getBestMove(board, active) {
+    const id = msgId++;
+
+    const bestMovePromise = new Promise(function (resolve, reject) {
+        resolves[id] = resolve;
+        rejects[id] = reject;
+
+        worker.postMessage({ messageType: "getBestMove", id: id, pieces: board, active: active});
+    });
+
+    return bestMovePromise;
 }
 
 function addComponent(text) {
@@ -70,7 +92,7 @@ let board =
     "--------";
 
 loadModule()
-    .then(_ => {
+    .then(async _ => {
         worker.postMessage({ messageType: "timeTest" });
 
         const start = Date.now();
@@ -81,13 +103,14 @@ loadModule()
         }
         addComponent(`Moved 100x in: ${Date.now() - start}`);
 
-        worker.postMessage({ messageType: "doMove", pieces: board, active: 0, square: 52 });
-
-        for (let i = 0; i < 10; i++) {
-            worker.postMessage({ messageType: "doBestMove", pieces: board, active: 1});   
-        }
+        addComponent(await getBestMove(board, 0));
+        addComponent(await doBestMove(board, 1));
     });
 
 import Game from "./vue/Game.vue";
-var app = new Vue({el: '#app', components: { Game }});
+const app = new Vue({
+    el: '#app',
+    components: { Game },
+    methods: { getBestMove }
+});
     
