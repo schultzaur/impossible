@@ -3,22 +3,17 @@ import { NUM_SQUARES, BLACK, BLACK_CHAR, WHITE_CHAR, WHITE, EMPTY_CHAR, EMPTY, N
 import { oppositeColor } from "./utils";
 import { AiBoard } from "./ai";
 
+const INVALID_MOVE: string = ":(";
+
 export function doMove(piecesStr: string, active: i8, square: i8): string {
     let board: Board = new Board(piecesFromString(piecesStr), -1);
     let newPieces: StaticArray<i8> = board.move(active, square);
 
     if (newPieces.length != 64) {
-        return ":(";
+        return INVALID_MOVE;
     }
 
     let newBoard = new Board(newPieces, square);
-    return formatBoard(newBoard);
-}
-
-export function doBestMove(piecesStr: string, active: i8): string {
-    let pieces: StaticArray<i8> = piecesFromString(piecesStr);
-    var aiBoard = new AiBoard(pieces, -1, active, oppositeColor(active));
-    var newBoard = aiBoard.doBestMove();
     return formatBoard(newBoard);
 }
 
@@ -26,11 +21,6 @@ export function getBestMove(piecesStr: string, active: i8): i8 {
     let pieces: StaticArray<i8> = piecesFromString(piecesStr);
     var aiBoard = new AiBoard(pieces, -1, active, oppositeColor(active));
     return aiBoard.getBestMove();
-}
-
-export function getValidMoves(piecesStr: string, active: i8): string {
-    let board: Board = new Board(piecesFromString(piecesStr), -1);
-    return formatBoard(board);
 }
 
 function formatBoard(board: Board): string {
@@ -46,7 +36,18 @@ function formatBoard(board: Board): string {
 }
 
 function formatMoves(moves: u64): string {
-    return ("0".repeat(64) + moves.toString(2)).slice(-64);
+    let movesStr: string = "";
+
+    for (let square: i8 = 0; square < NUM_SQUARES; square++) {
+        movesStr += (moves & 1).toString(2);
+
+        moves >>= 1;
+    }
+
+    return movesStr;
+
+    // TODO: figure out what to do here. no reverse in assemblyscript.
+    // return ("0".repeat(64) + moves.toString(2)).slice(-64);
 }
 
 function piecesToString(pieces: StaticArray<i8>): string {

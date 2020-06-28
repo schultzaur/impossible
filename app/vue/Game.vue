@@ -27,6 +27,7 @@
 <script>
 import Board from "./Board.vue"
 import * as othello from "../othello";
+import { piecesToString } from "../interop";
 
 export default {
     name: "game",
@@ -38,6 +39,7 @@ export default {
     computed: {},
     data() {
         var urlParams = new URLSearchParams(window.location.search);
+
         var gameState = othello.Game.fromGameLink(urlParams);
 
         return {
@@ -64,9 +66,11 @@ export default {
             var newGame = this.move(move);
 
             while (newGame && newGame.turn == oppositeTurn) {
-                var cpu_move = await this.getBestMove(this.gameState.toString(), this.gameState.turn);
+                var cpu_move = await this.getBestMove(piecesToString(this.gameState.pieces), this.gameState.turn);
                 if (cpu_move != -1) {
                     newGame = this.move({ row: Math.floor(cpu_move / 8), col: cpu_move % 8 });                   
+                } else {
+                    break;
                 }
             }
             
@@ -81,7 +85,7 @@ export default {
             return newGameState;
         },
         newGame() {
-            this.gameStates.push(othello.Game.getNewGame());
+            this.gameStates.push(othello.Game.getNewGame(this.player));
             this.gameState = this.gameStates[this.gameStates.length-1];
 
             if (this.first === othello.Players.CPU) {

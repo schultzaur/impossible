@@ -1,7 +1,7 @@
 import Game from "./vue/Game.vue";
 import "./main.css";
 import * as othello from "./othello";
-import { Board } from "../docs/renegade/othello";
+import { parseBoard, piecesToString } from "./interop";
 
 const loader = require("@assemblyscript/loader");
 const wasmPath = './asm/optimized.wasm';
@@ -16,8 +16,8 @@ let worker = new Worker('worker.js');
 worker.onmessage = function(e) {
     console.log(`${e.data.messageType} processed in ${e.data.timeTaken}ms: ${e.data.result}`)
 
-    resolves[e.data.id](e.data.result);
     // TODO: Figure out what to actually do here.
+    resolves[e.data.id](e.data.result);
 
     delete resolves[e.data.id];
     delete rejects[e.data.id];
@@ -43,7 +43,7 @@ async function loadModule() {
             _doMove, } = othelloWasm.exports;
     
     doMove = function(game, move) {
-        let pieces = game.toString();
+        let pieces = piecesToString(game.pieces);
         let active = game.turn;
         let square = othello.getIndex(move.row, move.col);
 
@@ -53,27 +53,12 @@ async function loadModule() {
         __release(newBoardPtr);
         __release(piecesPtr);
 
-        if (newBoard == ":(") {
-            return null;
-        }
+        console.log(newBoard);
         
-        return othello.Game.parseBoard(newBoard, game.player);
+        return parseBoard(newBoard, game.player);
     }
 
     return initWorker;
-}
-
-async function doBestMove(board, active) {
-    const id = msgId++;
-
-    const bestMovePromise = new Promise(function (resolve, reject) {
-        resolves[id] = resolve;
-        rejects[id] = reject;
-
-        worker.postMessage({ messageType: "doBestMove", id: id, pieces: board, active: active});
-    });
-
-    return bestMovePromise;
 }
 
 async function getBestMove(board, active) {
@@ -89,16 +74,6 @@ async function getBestMove(board, active) {
     return bestMovePromise;
 }
 
-let board =
-    "--------" +
-    "--------" +
-    "---B----" +
-    "---BBW--" +
-    "--BBWWW-" +
-    "--BWWW--" +
-    "--B-----" +
-    "--------";
-
 loadModule()
     .then(_ => {
         new Vue({
@@ -107,5 +82,3 @@ loadModule()
             methods: { doMove, getBestMove }
         });
     });
-
-    
