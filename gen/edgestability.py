@@ -28,19 +28,26 @@ def pieces_to_i(pieces):
     return i
 
 memo = [None] * (3 ** BOARD_SIZE)
-def get_row(pieces):
-    key = pieces_to_i(pieces)
-
+def get_row_key(key):
     if memo[key] is None:
-        memo[key] = Row(pieces)
+        memo[key] = Row(key=key)
 
     return memo[key]
 
+def get_row(pieces):
+    return get_row_key(pieces_to_i(pieces))
+
 class Row(object):
-    def __init__(self, pieces):
-        # [0,1,2,2,1,2,1,1,0]
-        self.pieces = pieces
-        self.key = pieces_to_i(pieces)
+    def __init__(self, pieces=None, key=None):
+        if pieces is not None:
+            self.pieces = pieces
+            self.key = pieces_to_i(pieces)
+        elif key is not None:
+            self.pieces = i_to_pieces(key)
+            self.key = key
+        else:
+            raise Exception("Need either pieces or key.")
+
         self.stability = [0] * 8
         self.set_stability()
 
@@ -90,8 +97,12 @@ class Row(object):
 
         return get_row(new_pieces)
 
-print(str(get_row([EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY])))
-print(str(get_row([EMPTY, EMPTY, BLACK, WHITE, BLACK, BLACK, WHITE, EMPTY])))
+for i in range(len(memo)-1, -1, -1):
+    get_row_key(i)
 
-#[0, 0, 0, 0, 0, 0, 0, 0]|0|[0, 0, 0, 0, 0, 0, 0, 0]
+print(str(get_row([0, 0, 1, 2, 1, 1, 2, 0])))
 #[0, 0, 1, 2, 1, 1, 2, 0]|447|[0, 0, 0, 1, 2, 2, 0, 0] yay
+
+with open("./gen/edgeStability.txt", "w") as f:
+    for row in memo:
+        f.write(str(row) + '\n')
