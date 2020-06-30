@@ -7,6 +7,12 @@ UNSTABLE = 0
 SEMI_STABLE = 1
 STABLE = 2
 
+def pieces_to_a(pieces, chars):
+    s = ""
+    for i in range(8):
+        s += chars[pieces[i]]
+    return s
+
 def i_to_pieces(i):
     if not 0 <= i < ROW_COMBINATIONS:
         raise Exception("input out of range.")
@@ -52,7 +58,7 @@ class Row(object):
         self.set_stability()
 
     def __str__(self):
-        return f"{self.pieces}|{self.key}|{self.stability}"
+        return f"{pieces_to_a(self.pieces, ['-','B','W'])}|{self.key:04}|{pieces_to_a(self.stability,['-','s','S'])}"
 
     def set_stability(self):
         next_rows = []
@@ -100,9 +106,38 @@ class Row(object):
 for i in range(len(memo)-1, -1, -1):
     get_row_key(i)
 
-print(str(get_row([0, 0, 1, 2, 1, 1, 2, 0])))
-#[0, 0, 1, 2, 1, 1, 2, 0]|447|[0, 0, 0, 1, 2, 2, 0, 0] yay
 
-with open("./gen/edgeStability.txt", "w") as f:
-    for row in memo:
-        f.write(str(row) + '\n')
+# https://www.labri.fr/perso/fleury/courses/pdp/Board_Games/Reversi/World-championship-level_othello_program.pdf
+# Corner 700 * *
+# C-Square 1200 200 -25
+# A-Square 1000 200  75
+# B-Square 1000 200  50
+# That paper users these numbers quite a bit differently, but this is just a starting point.
+
+SQUARE_WEIGHTS = [None, None, None]
+SQUARE_WEIGHTS[UNSTABLE] =    [   0,  -25,   75,   50,   50,   75,  -25,    0]
+SQUARE_WEIGHTS[SEMI_STABLE] = [   0,  200,  200,  200,  200,  200,  200,    0]
+SQUARE_WEIGHTS[STABLE] =      [ 700, 1200, 1000, 1000, 1000, 1000, 1200,  700]
+
+def score(row):
+    scores = [0, 0, 0]
+
+    for c in range(8):
+        scores[row.pieces[c]] += SQUARE_WEIGHTS[row.stability[c]][c]
+
+    return 100 * (scores[BLACK] - scores[WHITE]) / (scores[BLACK] + scores[WHITE] + 1000)
+
+
+out = sorted(memo, key=lambda x: score(x))
+
+
+with open("./gen/edgeStability.ts", "w") as f:
+    f.write("const EDGE_SCORES: Array<f32> = [\n")
+    for i in range(81):
+        scores = [f"{score(memo[j]):6.2f}" for j in range(i * 81, (i+1) * 81)]
+        f.write(f"    {', '.join(scores)},\n")
+    f.write("]\n")
+
+with open("./gen/edgeStabilityRaw.txt", "w") as f:
+    for r in out:
+        f.write(f"{score(r):5.2f},{r}\n")
