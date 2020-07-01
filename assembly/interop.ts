@@ -50,7 +50,7 @@ function formatMoves(moves: u64): string {
     // return ("0".repeat(64) + moves.toString(2)).slice(-64);
 }
 
-function piecesToString(pieces: StaticArray<i8>): string {
+export function piecesToString(pieces: StaticArray<i8>): string {
     let piecesStr: string = "";
 
     for (let square: i8 = 0; square < NUM_SQUARES; square++) {

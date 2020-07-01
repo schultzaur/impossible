@@ -132,7 +132,7 @@ out = sorted(memo, key=lambda x: score(x))
 
 
 with open("./gen/edgeStability.ts", "w") as f:
-    f.write("const EDGE_SCORES: Array<f32> = [\n")
+    f.write("export const EDGE_SCORES: Array<f32> = [\n")
     for i in range(81):
         scores = [f"{score(memo[j]):6.2f}" for j in range(i * 81, (i+1) * 81)]
         f.write(f"    {', '.join(scores)},\n")

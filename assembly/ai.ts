@@ -1,48 +1,37 @@
 import { Board } from "./board";
-import { oppositeColor, countSetBits } from "./utils";
-import { EMPTY, CORNER_MASK, NUM_SQUARES } from "./constants";
+import { countSetBits } from "./utils";
+import { BLACK, WHITE, EMPTY, CORNER_MASK, NUM_SQUARES } from "./constants";
+import { TOP_ROW, BOTTOM_ROW, LEFT_ROW, RIGHT_ROW } from "./constants";
+import { EDGE_SCORES } from "./edgeStability";
 
-const DEPTH: u8 = 6;
-const BRANCHING_FACTOR: u8 = 8;
+import { piecesToString } from "./interop";
 
-const PARITY_WEIGHT: u8 = 10;
-const MOBILITY_WEIGHT: u8 = 30;
-const CORNER_WEIGHT: u8 = 25;
-const STABILITY_WEIGHT: u8 = 30;
+const DEPTH: u8 = 9;
+const BRANCHING_FACTOR: u8 = 12;
 
-/*
-// row, col, line start direction, line direction.
-const CORNERS = [
-    [0,                    0,                    [ 0,  1],  [1,  0]],
-    [0,                    othello.BOARD_SIZE-1, [ 1,  0],  [0, -1]],
-    [othello.BOARD_SIZE-1, othello.BOARD_SIZE-1, [ 0, -1], [-1,  0]],
-    [othello.BOARD_SIZE-1, 0,                    [-1,  0], [ 0,  1]],
-];
+const PARITY_WEIGHT: f64 = 10;
+const MOBILITY_WEIGHT: f64 = 30;
+const CORNER_WEIGHT: f64 = 25;
+const STABILITY_WEIGHT: f64 = 50;
 
-const STABLE_ORDER_GRID = [
-    [ 0,  4, 12, 24, 29, 17,  9,  1],
-    [ 8, 20, 32, 40, 45, 37, 21,  5],
-    [16, 36, 48, 52, 57, 49, 33, 13],
-    [28, 44, 56, 60, 61, 53, 41, 25],
-    [27, 43, 55, 63, 62, 58, 46, 30],
-    [15, 35, 51, 59, 54, 50, 38, 18],
-    [ 7, 23, 39, 47, 42, 34, 22, 10],
-    [ 3, 11, 19, 31, 26, 14,  6,  2],
-];
-const STABLE_ORDER = new Array(64);
+function heuristicString(values: Array<f64>): string {
+    let s: string = "[";
 
-for (var row = 0; row < 8; row++) {
-    for (var col = 0; col < 8; col++) {
-        STABLE_ORDER[STABLE_ORDER_GRID[row][col]] = [row, col]; 
+    for (let i = 0; i < values.length; i++) {
+        if (i != 0) { s += ","; }
+        s += values[i].toString();
     }
+
+    s += "]";
+
+    return s;
 }
-*/
 
 export class AiBoard extends Board
 {
     maxColor: i8;
     minColor: i8;
-    heuristic: f64;
+    heuristic: Array<f64>;
 
     constructor(pieces: StaticArray<i8>, lastMove: i8, maxColor: i8, minColor: i8) {
         super(pieces, lastMove);
@@ -63,41 +52,37 @@ export class AiBoard extends Board
     }
 
     doBestMove(): AiBoard {
-        return this.aiMove(minimax(this, 0).move);
+        return this.aiMove(this.getBestMove());
     }
 
     getBestMove(): i8 {
-        return minimax(this, 0).move;
+        trace(heuristicString(this.heuristic) + "|" + piecesToString(this.pieces));
+        return minimax(this, 0, -Infinity, Infinity).board.lastMove;
     }
 
-    getHeuristic(): f64 {
-        var maxParity = this.countCoins(this.maxColor)
-        var minParity = this.countCoins(this.minColor)
+    getHeuristic(): Array<f64> {
+        var maxParity = this.countCoins(this.maxColor);
+        var minParity = this.countCoins(this.minColor);
         var parity: f64 = 100 * (maxParity - minParity) / (maxParity + minParity)
     
-        var maxMobility = this.countMobility(this.maxColor)
-        var minMobility = this.countMobility(this.minColor)
+        var maxMobility = this.countMobility(this.maxColor);
+        var minMobility = this.countMobility(this.minColor);
         var mobility: f64 = 0;
         if (maxMobility + minMobility == 0) {
             // Games over. 
-            this.heuristic = maxParity > minParity ? Infinity : -Infinity;
+            this.heuristic = [maxParity > minParity ? Infinity : -Infinity];
         } else {
             mobility = 100 * (maxMobility - minMobility) / (maxMobility + minMobility)
         }
         
-        var maxCorner = this.countCorners(this.maxColor)
-        var minCorner = this.countCorners(this.minColor)
+        var maxCorner = this.countCorners(this.maxColor);
+        var minCorner = this.countCorners(this.minColor);
         var corner: f64 = 0
         if (maxCorner + minCorner != 0) {
             corner = 100 * (maxCorner - minCorner) / (maxCorner + minCorner)
         }
     
-        var maxStable = this.countStable(this.maxColor)
-        var minStable = this.countStable(this.minColor)
-        var stable: f64 = 0
-        if (maxStable + minStable != 0) {
-            stable = 100 * (maxStable - minStable) / (maxStable + minStable)
-        }
+        var edgeStability = this.countEdgeStability()
     
         var mobilityWeight: f64;
         var stabilityWeight: f64;
@@ -105,29 +90,41 @@ export class AiBoard extends Board
         var cornerWeight: f64;
 
         if (maxParity + minParity < 30) {
+            mobilityWeight = MOBILITY_WEIGHT;
+            stabilityWeight = STABILITY_WEIGHT;
+    
+            parityWeight = -1 * PARITY_WEIGHT;
+    
+            cornerWeight = CORNER_WEIGHT;
+        } else if (maxParity + minParity < 50) {
+            parityWeight = 0 * PARITY_WEIGHT;
             mobilityWeight = 2 * MOBILITY_WEIGHT;
             stabilityWeight = 2 * STABILITY_WEIGHT;
-    
-            parityWeight = -PARITY_WEIGHT;
-    
             cornerWeight = CORNER_WEIGHT;
-        } else if (maxParity + minParity > 50) {
-            stabilityWeight = 4 * STABILITY_WEIGHT;
-            cornerWeight = 2 * CORNER_WEIGHT;
-    
+        } else {
+            stabilityWeight = STABILITY_WEIGHT;
             mobilityWeight = MOBILITY_WEIGHT;
             parityWeight = PARITY_WEIGHT;
-        } else {
-            parityWeight = 0 * PARITY_WEIGHT;
-            mobilityWeight = MOBILITY_WEIGHT;
             cornerWeight = CORNER_WEIGHT;
-            stabilityWeight = STABILITY_WEIGHT;
         }
-    
-        return parityWeight * parity
+        
+        const score: f64 =
+            parityWeight * parity
                 + mobilityWeight * mobility
                 + cornerWeight * corner
-                + stabilityWeight * stable;
+                + stabilityWeight * edgeStability;
+
+        if (score > 1000000) {
+            trace(heuristicString([score, parity, mobility, corner, edgeStability, parityWeight, mobilityWeight, cornerWeight, stabilityWeight])
+                + "|" + piecesToString(this.pieces));
+        }
+
+        return [
+            score,
+            parity,
+            mobility,
+            corner,
+            edgeStability];
     }
 
     countCoins(active: i8): f64 {
@@ -143,72 +140,100 @@ export class AiBoard extends Board
             countSetBits(this.bitBoard.moves[active] & CORNER_MASK);
     }
     
-    countStable(active: i8): f64 {
-        // var stability = othello.getEmptyBoard();
+    countEdgeStability(): f64 {
+        let stability: f64 = 0;
 
-        // CORNERS.forEach(corner => {
-        //     var lineStartRow = corner[0];
-        //     var lineStartCol = corner[1];
-        //     var lineStartDir = corner[2];
-        //     var lineDir = corner[3];
+        const blackPieces: u64 = this.bitBoard.pieces[BLACK]
+        const whitePieces: u64 = this.bitBoard.pieces[WHITE]
+        const pieces: u64 = blackPieces | whitePieces;
 
-        //     while (othello.onBoard(lineStartRow, lineStartCol) &&
-        //         this.pieces[lineStartRow][lineStartCol] === color) {
+        let key: u16 = 0;
+        let mask: u64 = 1 << 0;
+        if (pieces & TOP_ROW) {
+            for (let i: i8 = 0; i < 8; i++) {
+                key *= 3;
                 
-        //         var lineRow = lineStartRow;
-        //         var lineCol = lineStartCol;
+                if (blackPieces & mask) {
+                    key += 1;
+                } else if (whitePieces & mask) {
+                    key += 2;
+                }
 
-        //         var first = true;
-        //         while (true) {
-        //             var stableCheckRow = lineRow - lineStartDir[0] + (first ? 0 : lineDir[0]); 
-        //             var stableCheckCol = lineCol - lineStartDir[1] + (first ? 0 : lineDir[1]); 
+                mask <<= 1;
+            }
+        }
+        stability += EDGE_SCORES[key];
 
-        //             if (!othello.onBoard(lineRow, lineCol)
-        //                 || this.pieces[lineRow][lineCol] !== color
-        //                 || stability[lineRow][lineCol]
-        //                 || (othello.onBoard(stableCheckRow, stableCheckCol) && !stability[stableCheckRow][stableCheckCol]))
-        //             {
-        //                 break;
-        //             }
+        key = 0;
+        mask = 1 << 56; 
+        if (pieces & BOTTOM_ROW) {
+            for (let i: i8 = 0; i < 8; i++) {
+                key *= 3;
+                
+                if (blackPieces & mask) {
+                    key += 1;
+                } else if (whitePieces & mask) {
+                    key += 2;
+                }
 
-        //             stability[lineRow][lineCol] = 1;
+                mask <<= 1;
+            }
+        }
+        stability += EDGE_SCORES[key];
 
-        //             lineRow += lineDir[0];
-        //             lineCol += lineDir[1];
-        //         }
+        key = 0;
+        mask = 1 << 0;
+        if (pieces & LEFT_ROW) {
+            for (let i: i8 = 0; i < 8; i++) {
+                key *= 3;
+                
+                if (blackPieces & mask) {
+                    key += 1;
+                } else if (whitePieces & mask) {
+                    key += 2;
+                }
 
-        //         lineStartRow += lineStartDir[0];
-        //         lineStartCol += lineStartDir[1];
-        //     }
-        // })
+                mask <<= 8;
+            }
+        }
+        stability += EDGE_SCORES[key];
 
-        // var stableSum = 0;
-        // for (var row = 0; row < othello.BOARD_SIZE; row++) {
-        //     for (var col = 0; col < othello.BOARD_SIZE; col++) {
-        //         stableSum += stability[row][col];
-        //     }
-        // }
-        // return stableSum;
+        key = 0;
+        mask =  1 << 7;
+        if (pieces & RIGHT_ROW) {
+            for (let i: i8 = 0; i < 8; i++) {
+                key *= 3;
+                
+                if (blackPieces & mask) {
+                    key += 1;
+                } else if (whitePieces & mask) {
+                    key += 2;
+                }
 
-        return 0;
+                mask <<= 8;
+            }
+        }
+        stability += EDGE_SCORES[key];        
+
+        return this.maxColor == BLACK ? stability : -stability;
     }
 }
 
 class MoveScore {
     score: f64;
-    move: i8;
-    constructor(score: f64, move: i8) {
+    board: AiBoard;
+    constructor(score: f64, board: AiBoard) {
         this.score = score;
-        this.move = move;
+        this.board = board;
     }
 }
 
-function minimax(board: AiBoard, depth: u8): MoveScore {
+function minimax(board: AiBoard, depth: u8, alpha: f64, beta: f64): MoveScore {
     // maybe rework so pass skips a depth?
     
     if (board.active == EMPTY || depth == DEPTH)
     {
-        return new MoveScore(board.heuristic, board.lastMove);
+        return new MoveScore(board.heuristic[0], board);
     }
 
     let candidates = new Array<AiBoard>();
@@ -222,33 +247,52 @@ function minimax(board: AiBoard, depth: u8): MoveScore {
         mask <<= 1;
     }
 
-    let value: f64;
-    let move: i8;
-    if (board.active == board.maxColor) {
-        value = -Infinity;
-        move = -1;
+    let value: f64 = 0;
+    let best_i: i32 = -1;
 
-        candidates.sort(function(a, b) { return b.heuristic > a.heuristic ? 1 : -1 });
-        for (let i = 0; i < min(candidates.length, BRANCHING_FACTOR); i++) {
-            let mm = minimax(candidates[i], depth + 1);
-            if (value == -Infinity || mm.score > value) {
-                value = mm.score;
-                move = candidates[i].lastMove;
+    if (board.active == board.maxColor) {
+        candidates.sort(function(a, b) { return b.heuristic[0] > a.heuristic[0] ? 1 : -1 });
+
+        value = -Infinity;
+
+        for (let i: i32 = 0; i < min(candidates.length, BRANCHING_FACTOR); i++) {
+            let moveScore = minimax(candidates[i], depth + 1, alpha, beta);
+
+            if (best_i == -1 || moveScore.score > value) {
+                value = moveScore.score;
+                best_i = i;
+            }
+
+            if (moveScore.score > alpha) {
+                alpha = moveScore.score;
+            }
+
+            if (alpha >= beta) {
+                break;
             }
         }
     } else {
-        value = Infinity;
-        move = -1;
+        candidates.sort(function(a, b) { return b.heuristic[0] < a.heuristic[0] ? 1 : -1 });
 
-        candidates.sort(function(a, b) { return a.heuristic > b.heuristic ? 1 : -1 });
-        for (let i = 0; i < min(candidates.length, BRANCHING_FACTOR); i++) {
-            let mm = minimax(candidates[i], depth + 1);
-            if (value == Infinity || mm.score < value) {
-                value = mm.score;
-                move = candidates[i].lastMove;
+        value = Infinity;
+
+        for (let i: i32 = 0; i < min(candidates.length, BRANCHING_FACTOR); i++) {
+            let moveScore = minimax(candidates[i], depth + 1, alpha, beta);
+
+            if (best_i == -1 || moveScore.score < value) {
+                value = moveScore.score;
+                best_i = i;
+            }
+
+            if (moveScore.score < beta) {
+                beta = moveScore.score;
+            }
+
+            if (beta <= alpha) {
+                break;
             }
         }
     }
 
-    return new MoveScore(value, move);
+    return new MoveScore(value, candidates[best_i]);
 }

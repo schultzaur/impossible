@@ -38,9 +38,10 @@ export function countSetBits(v: u64): f64 {
 
     let c = v - ((v >> 1) & 0x5555555555555555);
     c = ((c >> 2) & 0x3333333333333333) + (c & 0x3333333333333333);
-    c = (c >> 4 + c) & 0x00FF00FF00FF00FF;
-    c = (c >> 8 + c) & 0x0000FFFF0000FFFF;
-    c = (c >> 16 + c) & 0x00000000FFFFFFFF;
+    c = ((c >> 4) + c) & 0x0F0F0F0F0F0F0F0F;
+    c = ((c >> 8) + c) & 0x00FF00FF00FF00FF;
+    c = ((c >> 16) + c) & 0x0000FFFF0000FFFF;
+    c = ((c >> 32) + c) & 0x00000000FFFFFFFF;
 
     return c as f64;
 }

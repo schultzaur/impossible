@@ -52,8 +52,6 @@ async function loadModule() {
         let newBoard = __getString(newBoardPtr);
         __release(newBoardPtr);
         __release(piecesPtr);
-
-        console.log(newBoard);
         
         return parseBoard(newBoard, game.player);
     }
