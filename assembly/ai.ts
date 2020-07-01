@@ -70,7 +70,7 @@ export class AiBoard extends Board
         var mobility: f64 = 0;
         if (maxMobility + minMobility == 0) {
             // Games over. 
-            this.heuristic = [maxParity > minParity ? Infinity : -Infinity];
+            return [maxParity > minParity ? Infinity : -Infinity];
         } else {
             mobility = 100 * (maxMobility - minMobility) / (maxMobility + minMobility)
         }
