@@ -1,273 +1,376 @@
-import * as ai from './ai.js';
-import * as othello from './othello.js';
+var main =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app/index.js");
+/******/ })
+/************************************************************************/
+/******/ ({
 
-var gameTemplate = 
-`<div class="game">
-    <board
-        v-on:clicked="clicked($event)"
-        v-bind:gameState="gameState">
-    </board>
-    <div class="controls">
-        <br>
-        <input type="radio" id="player" v-bind:value="player" v-model="first"> 
-        <label for="player">Player First</label>
-        <br>
-        <input type="radio" id="cpu" v-bind:value="cpu" v-model="first">
-        <label for="cpu">CPU First</label>
-        <br>
-        <button v-on:click="newGame()">New Game</button>
-        <br>
-        <button v-on:click="undo()">Undo</button>
-    </div>
-    <br>
-    <div class="gameLink"> 
-        <button v-on:click="copyGameLink()">Copy Game Link</button>
-        <input type="text" v-bind:value="gameLink" id="gameLinkInput"></input>
-    </div>
-</div>`
+/***/ "./app/index.js":
+/*!**********************!*\
+  !*** ./app/index.js ***!
+  \**********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-var boardTemplate = 
-`<div class="board">
-    <div
-        v-for="row in 8"
-        v-bind:key="row">
-        <square
-            v-for="col in 8"
-            v-bind:row="row-1"
-            v-bind:col="col-1"
-            v-bind:key="index(row, col)"
-            v-bind:gameState="gameState"
-            v-on="$listeners">
-        </square>
-    </div>
-</div>`
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _vue_Game_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vue/Game.vue */ \"./app/vue/Game.vue\");\n/* harmony import */ var _main_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main.css */ \"./app/main.css\");\n/* harmony import */ var _main_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_main_css__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _othello__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./othello */ \"./app/othello.js\");\n/* harmony import */ var _interop__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./interop */ \"./app/interop.js\");\n\n\n\n\n\nconst loader = __webpack_require__(/*! @assemblyscript/loader */ \"./node_modules/@assemblyscript/loader/index.js\");\nconst wasmPath = './renegade/asm/optimized.wasm';\n\nlet doMove;\n\nlet msgId = 0;\nlet resolves = {};\nlet rejects = {};\n\nlet worker = new Worker('./renegade/worker.js');\nworker.onmessage = function(e) {\n    console.log(`${e.data.messageType} processed in ${e.data.timeTaken}ms: ${e.data.result}`)\n\n    // TODO: Figure out what to actually do here.\n    resolves[e.data.id](e.data.result);\n\n    delete resolves[e.data.id];\n    delete rejects[e.data.id];\n}\n\nasync function loadModule() {\n    const id = msgId++;\n\n    const imports = { env: { abort() {} }};\n    const response = await fetch(wasmPath);\n    const buffer = await response.arrayBuffer();\n    const compiled = await WebAssembly.compile(buffer);\n\n    const initWorker = new Promise(function (resolve, reject) {\n        resolves[id] = resolve;\n        rejects[id] = reject;\n\n        worker.postMessage({ messageType: \"init\", id: id, wasmModule: compiled });\n    });\n\n    const othelloWasm = await loader.instantiate(compiled, imports);\n    const { __allocString, __retain, __release, __getString,\n            _doMove, } = othelloWasm.exports;\n    \n    doMove = function(game, move) {\n        let pieces = Object(_interop__WEBPACK_IMPORTED_MODULE_3__[\"piecesToString\"])(game.pieces);\n        let active = game.turn;\n        let square = _othello__WEBPACK_IMPORTED_MODULE_2__[\"getIndex\"](move.row, move.col);\n\n        let piecesPtr = __retain(__allocString(pieces));\n        let newBoardPtr = _doMove(piecesPtr, active, square);\n        let newBoard = __getString(newBoardPtr);\n        __release(newBoardPtr);\n        __release(piecesPtr);\n        \n        return Object(_interop__WEBPACK_IMPORTED_MODULE_3__[\"parseBoard\"])(newBoard, game.player);\n    }\n\n    return initWorker;\n}\n\nasync function getBestMove(board, active) {\n    const id = msgId++;\n\n    const bestMovePromise = new Promise(function (resolve, reject) {\n        resolves[id] = resolve;\n        rejects[id] = reject;\n\n        worker.postMessage({ messageType: \"getBestMove\", id: id, pieces: board, active: active});\n    });\n\n    return bestMovePromise;\n}\n\nloadModule()\n    .then(_ => {\n        new Vue({\n            el: '#app',\n            components: { Game: _vue_Game_vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"] },\n            methods: { doMove, getBestMove }\n        });\n    });\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/index.js?");
 
-var squareTemplate =
-`<a class="square"
-    v-on:click="$emit('clicked', { row: row, col: col })"
-    v-bind:style="squareStyle">
-    <div class="piece" v-bind:style="{ background: pieceColor, width: pieceSize, height: pieceSize }">
-    </div>
-</a>`;
+/***/ }),
 
+/***/ "./app/interop.js":
+/*!************************!*\
+  !*** ./app/interop.js ***!
+  \************************/
+/*! exports provided: piecesToString, boardToString, parseBoard */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-Vue.component('square', {
-    props: ['row', 'col', 'gameState'],
-    template: squareTemplate,
-    computed: {
-        squareStyle: function() {
-            if (this.row == this.gameState.lastMove[0] && this.col == this.gameState.lastMove[1]) {
-                return {
-                    "--background": "red",
-                    "--background-hover": "orange",
-                }
-            } else {
-                return {
-                    "--background": "green",
-                    "--background-hover": "yellowgreen",
-                }
-            }
-        },
-        piece: function() {
-            return this.gameState.board.pieces[this.row][this.col];
-        },
-        validMove: function() {
-            return this.gameState.validMovesBoard[this.row][this.col];
-        },
-        pieceColor: function () {
-            if (this.piece === othello.Colors.Black || this.validMove == othello.Colors.Black) {
-                return "black";
-            } else if (this.piece === othello.Colors.White || this.validMove == othello.Colors.White) {
-                return "white";
-            } else {             
-                return "none";
-            }
-        },
-        pieceSize: function() {
-            if (this.piece === othello.Colors.Black || this.piece === othello.Colors.White) {
-                return "32px";
-            } else if (this.validMove == othello.Colors.Black || this.validMove == othello.Colors.White) {
-                return "8px";
-            } else {
-                return "0px";
-            }
-        },
-    }
-});
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"piecesToString\", function() { return piecesToString; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"boardToString\", function() { return boardToString; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"parseBoard\", function() { return parseBoard; });\n/* harmony import */ var _othello__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./othello */ \"./app/othello.js\");\n\r\n\r\nconst BLACK_CHAR = \"B\";\r\nconst WHITE_CHAR = \"W\";\r\nconst EMPTY_CHAR = \"-\";\r\nconst INVALID_MOVE = \":(\";\r\n\r\nfunction getEmptyBoard() {\r\n    return new Array(_othello__WEBPACK_IMPORTED_MODULE_0__[\"BOARD_SIZE\"]).fill(0).map(() => new Array(_othello__WEBPACK_IMPORTED_MODULE_0__[\"BOARD_SIZE\"]).fill(_othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].None));\r\n}\r\n\r\nfunction parseActive(activeStr) {\r\n    switch(activeStr) {\r\n        case \"0\":\r\n            return _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black;\r\n        case \"1\":\r\n            return _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White;\r\n        case \"-1\":\r\n        default:\r\n            return _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].None;\r\n    }\r\n}\r\n\r\nfunction activeToString(active) {\r\n    switch(active) {\r\n        case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black:\r\n            return \"0\";\r\n        case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White:\r\n            return \"1\";\r\n        case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].None:\r\n        default:\r\n            return \"-1\";\r\n    }\r\n}\r\n\r\nfunction parseLastMove(m) {\r\n    let square = parseInt(m);\r\n\r\n    if (square == -1) {\r\n        return [-1, -1];\r\n    }\r\n\r\n    return [Math.floor(square / _othello__WEBPACK_IMPORTED_MODULE_0__[\"BOARD_SIZE\"]), square % _othello__WEBPACK_IMPORTED_MODULE_0__[\"BOARD_SIZE\"]];\r\n}\r\n\r\nfunction lastMoveToString(m) {\r\n    return Object(_othello__WEBPACK_IMPORTED_MODULE_0__[\"getIndex\"])(m[0], m[1]).toString();\r\n}\r\n\r\nfunction parsePieces(piecesStr) {\r\n    let pieces = getEmptyBoard();\r\n\r\n    for (let row = 0; row < 8; row++) {\r\n        for (let col = 0; col < 8; col++) {\r\n            switch(piecesStr.charAt(Object(_othello__WEBPACK_IMPORTED_MODULE_0__[\"getIndex\"])(row, col))) {\r\n                case BLACK_CHAR:\r\n                    pieces[row][col] = _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black;\r\n                    break;\r\n                case WHITE_CHAR:\r\n                    pieces[row][col] = _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White;\r\n                    break;\r\n            }\r\n        }\r\n    }\r\n\r\n    return pieces;\r\n}\r\n\r\nfunction piecesToString(pieces) {\r\n    let piecesStr = \"\";\r\n    \r\n    for (let row = 0; row < 8; row++) {\r\n        for (let col = 0; col < 8; col++) {\r\n            switch(pieces[row][col]) {\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black:\r\n                    piecesStr += BLACK_CHAR;\r\n                    break;\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White:\r\n                    piecesStr += WHITE_CHAR;\r\n                    break;\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].None:\r\n                default:\r\n                    piecesStr += EMPTY_CHAR;\r\n                    break;\r\n            }\r\n        }\r\n    }\r\n\r\n    return piecesStr;\r\n}\r\n\r\nfunction parseMoves(movesStr, color) {\r\n    let moves = getEmptyBoard();\r\n    \r\n    for (let row = 0; row < 8; row++) {\r\n        for (let col = 0; col < 8; col++) {\r\n            if (movesStr.charAt(Object(_othello__WEBPACK_IMPORTED_MODULE_0__[\"getIndex\"])(row, col)) == \"1\") {\r\n                moves[row][col] = color;\r\n            }\r\n        }\r\n    }\r\n\r\n    return moves\r\n}\r\n\r\nfunction movesToString(moves) {\r\n    let movesStr = \"\";\r\n    \r\n    for (let row = 0; row < 8; row++) {\r\n        for (let col = 0; col < 8; col++) {\r\n            switch(moves[row][col]) {\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black:\r\n                    movesStr += \"1\";\r\n                    break;\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White:\r\n                    movesStr += \"1\";\r\n                    break;\r\n                case _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].None:\r\n                default:\r\n                    movesStr += \"0\";\r\n                    break;\r\n            }\r\n        }\r\n    }\r\n\r\n    return movesStr;\r\n}\r\n    \r\nfunction boardToString(game) {\r\n    return `${activeToString(game.turn)}|${lastMoveToString(game.lastMove)}|${piecesToString(game.pieces)}`\r\n        + `|${movesToString(game.validMoves[_othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black])}|${movesToString(game.validMoves[_othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White])}`;\r\n}\r\n\r\nfunction parseBoard(boardStr, player) {\r\n    if (boardStr == INVALID_MOVE) {\r\n        return null;\r\n    }\r\n\r\n    let tokens = boardStr.split(\"|\");\r\n\r\n    return new _othello__WEBPACK_IMPORTED_MODULE_0__[\"Game\"](\r\n        parsePieces(tokens[2]),\r\n        {\r\n            [_othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black]: parseMoves(tokens[3], _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black),\r\n            [_othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White]: parseMoves(tokens[4], _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White),\r\n        },\r\n        player,\r\n        parseActive(tokens[0]),\r\n        parseLastMove(tokens[1])\r\n    );\r\n}\r\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/interop.js?");
 
-Vue.component('board', {
-    props: ['gameState'],
-    template: boardTemplate,
-    computed: {},
-    methods: {
-        index(row, col) {
-            return othello.getIndex(row-1, col-1);
-        },
-    }
-});
+/***/ }),
 
-Vue.component('game', {
-    props: [],
-    template: gameTemplate,
-    computed: {},
-    data() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var gameState = Game.fromGameLink(urlParams);
+/***/ "./app/main.css":
+/*!**********************!*\
+  !*** ./app/main.css ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-        return {
-            gameStates: [gameState],
-            gameState: gameState,
-            first: gameState.player == othello.Colors.Black ? Players.Player : Players.CPU,
-        };
-    },
-    computed: {
-        player : function() {
-            return Players.Player;
-        },
-        cpu: function() {
-            return Players.CPU;
-        },
-        gameLink: function() {
-            return this.gameState.getGameLink();
-        }
-    },
-    methods: {
-        clicked(move) {
-            var oppositeTurn = othello.getOppositeColor(this.gameState.turn);
+eval("var api = __webpack_require__(/*! ../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ \"./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js\");\n            var content = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!./main.css */ \"./node_modules/css-loader/dist/cjs.js!./app/main.css\");\n\n            content = content.__esModule ? content.default : content;\n\n            if (typeof content === 'string') {\n              content = [[module.i, content, '']];\n            }\n\nvar options = {};\n\noptions.insert = \"head\";\noptions.singleton = false;\n\nvar update = api(content, options);\n\n\n\nmodule.exports = content.locals || {};\n\n//# sourceURL=webpack://%5Bname%5D/./app/main.css?");
 
-            var newGame = this.move(move);
+/***/ }),
 
-            while (newGame && newGame.turn == oppositeTurn) {
-                var cpu_move = ai.findBestMove(this.gameState.board, this.gameState.turn);
-                newGame = this.move({ row: cpu_move[0], col: cpu_move[1] });
-            }
-        },
-        move(move) {
-            var newGameState = this.gameState.move(move.row, move.col);
-            if (newGameState) {
-                this.gameStates.push(newGameState);
-                this.gameState = this.gameStates[this.gameStates.length-1];
-            }
-            return newGameState;
-        },
-        newGame() {
-            this.gameStates.push(new Game());
-            this.gameState = this.gameStates[this.gameStates.length-1];
+/***/ "./app/othello.js":
+/*!************************!*\
+  !*** ./app/othello.js ***!
+  \************************/
+/*! exports provided: BOARD_SIZE, Players, Colors, Game, getOppositeColor, getIndex */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-            if (this.first === Players.CPU) {
-                var middle = Math.floor(othello.BOARD_SIZE/2) - 1;
-                this.move({ row: middle-1, col: middle});
-            }
-        },
-        undo() {
-            if (this.gameStates.length > 1) {
-                this.gameStates.pop();
-                this.gameState = this.gameStates[this.gameStates.length-1];
-            }
-        },
-        copyGameLink() {
-            var input = $('#gameLinkInput')[0]
-            input.select();
-            input.setSelectionRange(0,1000);
-            window.document.execCommand("copy");
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"BOARD_SIZE\", function() { return BOARD_SIZE; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Players\", function() { return Players; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Colors\", function() { return Colors; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Game\", function() { return Game; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getOppositeColor\", function() { return getOppositeColor; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getIndex\", function() { return getIndex; });\n/* harmony import */ var _interop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./interop */ \"./app/interop.js\");\n\r\n\r\nconst BOARD_SIZE = 8;\r\n\r\nconst Players = {\r\n    Player: 1,\r\n    CPU: 2,\r\n}\r\n\r\nconst Colors = {\r\n    Black: 0,\r\n    White: 1,\r\n    None: 2,\r\n}\r\n\r\nconst newGameStr =\r\n    \"0\"\r\n    + \"|-1\"\r\n    + \"|---------------------------WB------BW---------------------------\"\r\n    + \"|0000000000000000000100000010000000000100000010000000000000000000\"\r\n    + \"|0000000000000000000010000000010000100000000100000000000000000000\";\r\n\r\nclass Game {\r\n    constructor(pieces, validMoves, playerColor, turnColor, lastMove) {\r\n        this.pieces = pieces;\r\n        this.validMoves = validMoves;\r\n        this.player = playerColor;\r\n        this.turn = turnColor;\r\n        this.lastMove = lastMove;\r\n    }\r\n\r\n    static getNewGame(p) {\r\n        return Object(_interop__WEBPACK_IMPORTED_MODULE_0__[\"parseBoard\"])(newGameStr, p);\r\n    }\r\n\r\n    getGameLink() {\r\n        var path;\r\n        if (document.baseURI.indexOf(\"127.0.0.1\") > -1 || document.baseURI.indexOf(\"localhost\")) {\r\n            path = \"./renegade.html\";\r\n        } else {\r\n            path = \"./renegade\";\r\n        }\r\n\r\n        path += `?board=${Object(_interop__WEBPACK_IMPORTED_MODULE_0__[\"boardToString\"])(this)}&player=${this.player}`;\r\n\r\n        return new URL(path, document.baseURI).href;\r\n    }\r\n\r\n    static fromGameLink(urlParams) {\r\n        try {\r\n            var board = urlParams.get('board');\r\n            var player = urlParams.get('player');\r\n\r\n            if (board && player) {\r\n                return Object(_interop__WEBPACK_IMPORTED_MODULE_0__[\"parseBoard\"])(board, parseInt(player));\r\n            }\r\n        }\r\n        catch (error) {\r\n            console.log(error);\r\n        }\r\n        \r\n        return Game.getNewGame(Colors.Black);\r\n    }\r\n}\r\n\r\nfunction getOppositeColor(color) {\r\n    return color === Colors.White ? Colors.Black : Colors.White;\r\n}\r\n\r\nfunction getIndex(row, col) {\r\n    return row * BOARD_SIZE + col;\r\n}\n\n//# sourceURL=webpack://%5Bname%5D/./app/othello.js?");
 
-            if (window.getSelection) {
-                window.getSelection().removeAllRanges();
-            } else if (document.selection) {
-                document.selection.empty();
-            }
-        }
-    }
-});
+/***/ }),
 
-const Players = {
-    Player: 1,
-    CPU: 2,
-}
+/***/ "./app/vue/Board.vue":
+/*!***************************!*\
+  !*** ./app/vue/Board.vue ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-class Game {
-    constructor(board, playerColor, turnColor, lastMove) {
-        this.board = (typeof board !== 'undefined') ? board : new othello.Board();
-        this.player = (typeof playerColor !== 'undefined') ? playerColor : othello.Colors.Black;
-        this.turn = (typeof turnColor !== 'undefined') ? turnColor : othello.Colors.Black;
-        this.lastMove = (typeof lastMove !== 'undefined') ? lastMove : [-1,-1];
-        this.validMovesBoard = this.getValidMovesBoard();
-    }
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Board.vue?vue&type=template&id=ea36e71e& */ \"./app/vue/Board.vue?vue&type=template&id=ea36e71e&\");\n/* harmony import */ var _Board_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Board.vue?vue&type=script&lang=js& */ \"./app/vue/Board.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\n\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _Board_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  null,\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"app/vue/Board.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Board.vue?");
 
-    getValidMovesBoard() {
-        var validMoves = othello.getEmptyBoard();
+/***/ }),
 
-        if (this.turn == othello.Colors.None) {
-            return validMoves;
-        }
+/***/ "./app/vue/Board.vue?vue&type=script&lang=js&":
+/*!****************************************************!*\
+  !*** ./app/vue/Board.vue?vue&type=script&lang=js& ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-        this.board.validMoves[this.turn].forEach(validMove => {
-            validMoves[validMove[0]][validMove[1]] = this.turn;
-        })
-       
-        return validMoves;
-    }
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Board_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib??vue-loader-options!../../node_modules/source-map-loader/dist/cjs.js!./Board.vue?vue&type=script&lang=js& */ \"./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Board.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Board_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Board.vue?");
 
-    move(row, col) {
-        if (this.turn == othello.Colors.None || !othello.isValidMove(this.board.pieces, row, col, this.turn)) {
-            return false;
-        }
+/***/ }),
 
-        var oppositeTurn = othello.getOppositeColor(this.turn)
-        var newPieces = this.board.move(row, col, this.turn, oppositeTurn);
+/***/ "./app/vue/Board.vue?vue&type=template&id=ea36e71e&":
+/*!**********************************************************!*\
+  !*** ./app/vue/Board.vue?vue&type=template&id=ea36e71e& ***!
+  \**********************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-        if (!newPieces) {
-            return false;
-        }
-        var newBoard = new othello.Board(newPieces);
-        var nextTurn = othello.Colors.None;
-        if (newBoard.validMoves[oppositeTurn].length > 0) {
-            nextTurn = oppositeTurn;
-        } else if (newBoard.validMoves[this.turn].length > 0) {
-            nextTurn = this.turn;
-        }
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../node_modules/vue-loader/lib??vue-loader-options!./Board.vue?vue&type=template&id=ea36e71e& */ \"./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Board.vue?vue&type=template&id=ea36e71e&\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__[\"render\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Board_vue_vue_type_template_id_ea36e71e___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"]; });\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Board.vue?");
 
-        return new Game(newBoard, this.player, nextTurn, [row, col]);
-    }
+/***/ }),
 
-    getGameLink() {
-        var path;
-        if (document.baseURI.indexOf("127.0.0.1") > -1) {
-            path = "./renegade.html";
-        } else {
-            path = "./renegade";
-        }
+/***/ "./app/vue/Game.vue":
+/*!**************************!*\
+  !*** ./app/vue/Game.vue ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-        var pieces = JSON.stringify(this.board.pieces);
-        var player = JSON.stringify(this.player);
-        var currentPlayer = JSON.stringify(this.turn);
-        var lastMove = JSON.stringify(this.lastMove);
-        
-        path += `?pieces=${pieces}&player=${player}&currentPlayer=${currentPlayer}&lastMove=${lastMove}`
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game.vue?vue&type=template&id=c3e44592& */ \"./app/vue/Game.vue?vue&type=template&id=c3e44592&\");\n/* harmony import */ var _Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Game.vue?vue&type=script&lang=js& */ \"./app/vue/Game.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\n\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  null,\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"app/vue/Game.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Game.vue?");
 
-        return new URL(path, document.baseURI).href;
-    }
+/***/ }),
 
-    static fromGameLink(urlParams) {
-        try {
-            var pieces = JSON.parse(urlParams.get('pieces'));
-            var playerColor = JSON.parse(urlParams.get('player'));
-            var turnColor = JSON.parse(urlParams.get('currentPlayer'));
-            var lastMove = JSON.parse(urlParams.get('lastMove'));
+/***/ "./app/vue/Game.vue?vue&type=script&lang=js&":
+/*!***************************************************!*\
+  !*** ./app/vue/Game.vue?vue&type=script&lang=js& ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-            if (pieces && playerColor && turnColor && lastMove) {
-                return new Game(new othello.Board(pieces), playerColor, turnColor, lastMove);
-            }
-        }
-        catch (error) {
-            console.log(error);
-        }        
-        
-        return new Game();
-    }
-}
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib??vue-loader-options!../../node_modules/source-map-loader/dist/cjs.js!./Game.vue?vue&type=script&lang=js& */ \"./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Game.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Game.vue?");
 
-export function loadApp()
-{
-    var app = new Vue({el: '#app'});
-}
+/***/ }),
+
+/***/ "./app/vue/Game.vue?vue&type=template&id=c3e44592&":
+/*!*********************************************************!*\
+  !*** ./app/vue/Game.vue?vue&type=template&id=c3e44592& ***!
+  \*********************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../node_modules/vue-loader/lib??vue-loader-options!./Game.vue?vue&type=template&id=c3e44592& */ \"./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Game.vue?vue&type=template&id=c3e44592&\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__[\"render\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Game_vue_vue_type_template_id_c3e44592___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"]; });\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Game.vue?");
+
+/***/ }),
+
+/***/ "./app/vue/Square.vue":
+/*!****************************!*\
+  !*** ./app/vue/Square.vue ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Square.vue?vue&type=template&id=2fa3b4bc& */ \"./app/vue/Square.vue?vue&type=template&id=2fa3b4bc&\");\n/* harmony import */ var _Square_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Square.vue?vue&type=script&lang=js& */ \"./app/vue/Square.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\n\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(\n  _Square_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[\"default\"],\n  _Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__[\"render\"],\n  _Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"],\n  false,\n  null,\n  null,\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"app/vue/Square.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Square.vue?");
+
+/***/ }),
+
+/***/ "./app/vue/Square.vue?vue&type=script&lang=js&":
+/*!*****************************************************!*\
+  !*** ./app/vue/Square.vue?vue&type=script&lang=js& ***!
+  \*****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Square_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib??vue-loader-options!../../node_modules/source-map-loader/dist/cjs.js!./Square.vue?vue&type=script&lang=js& */ \"./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Square.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_vue_loader_lib_index_js_vue_loader_options_node_modules_source_map_loader_dist_cjs_js_Square_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Square.vue?");
+
+/***/ }),
+
+/***/ "./app/vue/Square.vue?vue&type=template&id=2fa3b4bc&":
+/*!***********************************************************!*\
+  !*** ./app/vue/Square.vue?vue&type=template&id=2fa3b4bc& ***!
+  \***********************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../node_modules/vue-loader/lib??vue-loader-options!./Square.vue?vue&type=template&id=2fa3b4bc& */ \"./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Square.vue?vue&type=template&id=2fa3b4bc&\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__[\"render\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Square_vue_vue_type_template_id_2fa3b4bc___WEBPACK_IMPORTED_MODULE_0__[\"staticRenderFns\"]; });\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Square.vue?");
+
+/***/ }),
+
+/***/ "./node_modules/@assemblyscript/loader/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@assemblyscript/loader/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\n// Runtime header offsets\nconst ID_OFFSET = -8;\nconst SIZE_OFFSET = -4;\n\n// Runtime ids\nconst ARRAYBUFFER_ID = 0;\nconst STRING_ID = 1;\n// const ARRAYBUFFERVIEW_ID = 2;\n\n// Runtime type information\nconst ARRAYBUFFERVIEW = 1 << 0;\nconst ARRAY = 1 << 1;\nconst STATICARRAY = 1 << 2;\n// const SET = 1 << 3;\n// const MAP = 1 << 4;\nconst VAL_ALIGN_OFFSET = 6;\n// const VAL_ALIGN = 1 << VAL_ALIGN_OFFSET;\nconst VAL_SIGNED = 1 << 11;\nconst VAL_FLOAT = 1 << 12;\n// const VAL_NULLABLE = 1 << 13;\nconst VAL_MANAGED = 1 << 14;\n// const KEY_ALIGN_OFFSET = 15;\n// const KEY_ALIGN = 1 << KEY_ALIGN_OFFSET;\n// const KEY_SIGNED = 1 << 20;\n// const KEY_FLOAT = 1 << 21;\n// const KEY_NULLABLE = 1 << 22;\n// const KEY_MANAGED = 1 << 23;\n\n// Array(BufferView) layout\nconst ARRAYBUFFERVIEW_BUFFER_OFFSET = 0;\nconst ARRAYBUFFERVIEW_DATASTART_OFFSET = 4;\nconst ARRAYBUFFERVIEW_DATALENGTH_OFFSET = 8;\nconst ARRAYBUFFERVIEW_SIZE = 12;\nconst ARRAY_LENGTH_OFFSET = 12;\nconst ARRAY_SIZE = 16;\n\nconst BIGINT = typeof BigUint64Array !== \"undefined\";\nconst THIS = Symbol();\nconst CHUNKSIZE = 1024;\n\n/** Gets a string from an U32 and an U16 view on a memory. */\nfunction getStringImpl(buffer, ptr) {\n  const U32 = new Uint32Array(buffer);\n  const U16 = new Uint16Array(buffer);\n  let length = U32[(ptr + SIZE_OFFSET) >>> 2] >>> 1;\n  let offset = ptr >>> 1;\n  if (length <= CHUNKSIZE) return String.fromCharCode.apply(String, U16.subarray(offset, offset + length));\n  const parts = [];\n  do {\n    const last = U16[offset + CHUNKSIZE - 1];\n    const size = last >= 0xD800 && last < 0xDC00 ? CHUNKSIZE - 1 : CHUNKSIZE;\n    parts.push(String.fromCharCode.apply(String, U16.subarray(offset, offset += size)));\n    length -= size;\n  } while (length > CHUNKSIZE);\n  return parts.join(\"\") + String.fromCharCode.apply(String, U16.subarray(offset, offset + length));\n}\n\n/** Prepares the base module prior to instantiation. */\nfunction preInstantiate(imports) {\n  const extendedExports = {};\n\n  function getString(memory, ptr) {\n    if (!memory) return \"<yet unknown>\";\n    return getStringImpl(memory.buffer, ptr);\n  }\n\n  // add common imports used by stdlib for convenience\n  const env = (imports.env = imports.env || {});\n  env.abort = env.abort || function abort(msg, file, line, colm) {\n    const memory = extendedExports.memory || env.memory; // prefer exported, otherwise try imported\n    throw Error(\"abort: \" + getString(memory, msg) + \" at \" + getString(memory, file) + \":\" + line + \":\" + colm);\n  };\n  env.trace = env.trace || function trace(msg, n) {\n    const memory = extendedExports.memory || env.memory;\n    console.log(\"trace: \" + getString(memory, msg) + (n ? \" \" : \"\") + Array.prototype.slice.call(arguments, 2, 2 + n).join(\", \"));\n  };\n  env.seed = env.seed || function seed() {\n    return Date.now();\n  };\n  imports.Math = imports.Math || Math;\n  imports.Date = imports.Date || Date;\n\n  return extendedExports;\n}\n\n/** Prepares the final module once instantiation is complete. */\nfunction postInstantiate(extendedExports, instance) {\n  const exports = instance.exports;\n  const memory = exports.memory;\n  const table = exports.table;\n  const alloc = exports[\"__alloc\"];\n  const retain = exports[\"__retain\"];\n  const rttiBase = exports[\"__rtti_base\"] || ~0; // oob if not present\n\n  /** Gets the runtime type info for the given id. */\n  function getInfo(id) {\n    const U32 = new Uint32Array(memory.buffer);\n    const count = U32[rttiBase >>> 2];\n    if ((id >>>= 0) >= count) throw Error(\"invalid id: \" + id);\n    return U32[(rttiBase + 4 >>> 2) + id * 2];\n  }\n\n  /** Gets the runtime base id for the given id. */\n  function getBase(id) {\n    const U32 = new Uint32Array(memory.buffer);\n    const count = U32[rttiBase >>> 2];\n    if ((id >>>= 0) >= count) throw Error(\"invalid id: \" + id);\n    return U32[(rttiBase + 4 >>> 2) + id * 2 + 1];\n  }\n\n  /** Gets the runtime alignment of a collection's values. */\n  function getValueAlign(info) {\n    return 31 - Math.clz32((info >>> VAL_ALIGN_OFFSET) & 31); // -1 if none\n  }\n\n  /** Gets the runtime alignment of a collection's keys. */\n  // function getKeyAlign(info) {\n  //   return 31 - Math.clz32((info >>> KEY_ALIGN_OFFSET) & 31); // -1 if none\n  // }\n\n  /** Allocates a new string in the module's memory and returns its retained pointer. */\n  function __allocString(str) {\n    const length = str.length;\n    const ptr = alloc(length << 1, STRING_ID);\n    const U16 = new Uint16Array(memory.buffer);\n    for (var i = 0, p = ptr >>> 1; i < length; ++i) U16[p + i] = str.charCodeAt(i);\n    return ptr;\n  }\n\n  extendedExports.__allocString = __allocString;\n\n  /** Reads a string from the module's memory by its pointer. */\n  function __getString(ptr) {\n    const buffer = memory.buffer;\n    const id = new Uint32Array(buffer)[ptr + ID_OFFSET >>> 2];\n    if (id !== STRING_ID) throw Error(\"not a string: \" + ptr);\n    return getStringImpl(buffer, ptr);\n  }\n\n  extendedExports.__getString = __getString;\n\n  /** Gets the view matching the specified alignment, signedness and floatness. */\n  function getView(alignLog2, signed, float) {\n    const buffer = memory.buffer;\n    if (float) {\n      switch (alignLog2) {\n        case 2: return new Float32Array(buffer);\n        case 3: return new Float64Array(buffer);\n      }\n    } else {\n      switch (alignLog2) {\n        case 0: return new (signed ? Int8Array : Uint8Array)(buffer);\n        case 1: return new (signed ? Int16Array : Uint16Array)(buffer);\n        case 2: return new (signed ? Int32Array : Uint32Array)(buffer);\n        case 3: return new (signed ? BigInt64Array : BigUint64Array)(buffer);\n      }\n    }\n    throw Error(\"unsupported align: \" + alignLog2);\n  }\n\n  /** Allocates a new array in the module's memory and returns its retained pointer. */\n  function __allocArray(id, values) {\n    const info = getInfo(id);\n    if (!(info & (ARRAYBUFFERVIEW | ARRAY | STATICARRAY))) throw Error(\"not an array: \" + id + \", flags= \" + info);\n    const align = getValueAlign(info);\n    const length = values.length;\n    const buf = alloc(length << align, info & STATICARRAY ? id : ARRAYBUFFER_ID);\n    let result;\n    if (info & STATICARRAY) {\n      result = buf;\n    } else {\n      const arr = alloc(info & ARRAY ? ARRAY_SIZE : ARRAYBUFFERVIEW_SIZE, id);\n      const U32 = new Uint32Array(memory.buffer);\n      U32[arr + ARRAYBUFFERVIEW_BUFFER_OFFSET >>> 2] = retain(buf);\n      U32[arr + ARRAYBUFFERVIEW_DATASTART_OFFSET >>> 2] = buf;\n      U32[arr + ARRAYBUFFERVIEW_DATALENGTH_OFFSET >>> 2] = length << align;\n      if (info & ARRAY) U32[arr + ARRAY_LENGTH_OFFSET >>> 2] = length;\n      result = arr;\n    }\n    const view = getView(align, info & VAL_SIGNED, info & VAL_FLOAT);\n    if (info & VAL_MANAGED) {\n      for (let i = 0; i < length; ++i) view[(buf >>> align) + i] = retain(values[i]);\n    } else {\n      view.set(values, buf >>> align);\n    }\n    return result;\n  }\n\n  extendedExports.__allocArray = __allocArray;\n\n  /** Gets a live view on an array's values in the module's memory. Infers the array type from RTTI. */\n  function __getArrayView(arr) {\n    const U32 = new Uint32Array(memory.buffer);\n    const id = U32[arr + ID_OFFSET >>> 2];\n    const info = getInfo(id);\n    if (!(info & (ARRAYBUFFERVIEW | ARRAY | STATICARRAY))) throw Error(\"not an array: \" + id + \", flags=\" + info);\n    const align = getValueAlign(info);\n    let buf = info & STATICARRAY\n      ? arr\n      : U32[arr + ARRAYBUFFERVIEW_DATASTART_OFFSET >>> 2];\n    const length = info & ARRAY\n      ? U32[arr + ARRAY_LENGTH_OFFSET >>> 2]\n      : U32[buf + SIZE_OFFSET >>> 2] >>> align;\n    return getView(align, info & VAL_SIGNED, info & VAL_FLOAT).subarray(buf >>>= align, buf + length);\n  }\n\n  extendedExports.__getArrayView = __getArrayView;\n\n  /** Copies an array's values from the module's memory. Infers the array type from RTTI. */\n  function __getArray(arr) {\n    const input = __getArrayView(arr);\n    const len = input.length;\n    const out = new Array(len);\n    for (let i = 0; i < len; i++) out[i] = input[i];\n    return out;\n  }\n\n  extendedExports.__getArray = __getArray;\n\n  /** Copies an ArrayBuffer's value from the module's memory. */\n  function __getArrayBuffer(ptr) {\n    const buffer = memory.buffer;\n    const length = new Uint32Array(buffer)[ptr + SIZE_OFFSET >>> 2];\n    return buffer.slice(ptr, ptr + length);\n  }\n\n  extendedExports.__getArrayBuffer = __getArrayBuffer;\n\n  /** Copies a typed array's values from the module's memory. */\n  function getTypedArray(Type, alignLog2, ptr) {\n    return new Type(getTypedArrayView(Type, alignLog2, ptr));\n  }\n\n  /** Gets a live view on a typed array's values in the module's memory. */\n  function getTypedArrayView(Type, alignLog2, ptr) {\n    const buffer = memory.buffer;\n    const U32 = new Uint32Array(buffer);\n    const bufPtr = U32[ptr + ARRAYBUFFERVIEW_DATASTART_OFFSET >>> 2];\n    return new Type(buffer, bufPtr, U32[bufPtr + SIZE_OFFSET >>> 2] >>> alignLog2);\n  }\n\n  /** Attach a set of get TypedArray and View functions to the exports. */\n  function attachTypedArrayFunctions(ctor, name, align) {\n    extendedExports[\"__get\" + name] = getTypedArray.bind(null, ctor, align);\n    extendedExports[\"__get\" + name + \"View\"] = getTypedArrayView.bind(null, ctor, align);\n  }\n\n  [\n    Int8Array,\n    Uint8Array,\n    Uint8ClampedArray,\n    Int16Array,\n    Uint16Array,\n    Int32Array,\n    Uint32Array,\n    Float32Array,\n    Float64Array\n  ].forEach(ctor => {\n    attachTypedArrayFunctions(ctor, ctor.name, 31 - Math.clz32(ctor.BYTES_PER_ELEMENT));\n  });\n\n  if (BIGINT) {\n    [BigUint64Array, BigInt64Array].forEach(ctor => {\n      attachTypedArrayFunctions(ctor, ctor.name.slice(3), 3);\n    });\n  }\n\n  /** Tests whether an object is an instance of the class represented by the specified base id. */\n  function __instanceof(ptr, baseId) {\n    const U32 = new Uint32Array(memory.buffer);\n    let id = U32[(ptr + ID_OFFSET) >>> 2];\n    if (id <= U32[rttiBase >>> 2]) {\n      do {\n        if (id == baseId) return true;\n        id = getBase(id);\n      } while (id);\n    }\n    return false;\n  }\n\n  extendedExports.__instanceof = __instanceof;\n\n  // Pull basic exports to extendedExports so code in preInstantiate can use them\n  extendedExports.memory = extendedExports.memory || memory;\n  extendedExports.table  = extendedExports.table  || table;\n\n  // Demangle exports and provide the usual utility on the prototype\n  return demangle(exports, extendedExports);\n}\n\nfunction isResponse(src) {\n  return typeof Response !== \"undefined\" && src instanceof Response;\n}\n\nfunction isModule(src) {\n  return src instanceof WebAssembly.Module;\n}\n\n/** Asynchronously instantiates an AssemblyScript module from anything that can be instantiated. */\nasync function instantiate(source, imports = {}) {\n  if (isResponse(source = await source)) return instantiateStreaming(source, imports);\n  const module = isModule(source) ? source : await WebAssembly.compile(source);\n  const extended = preInstantiate(imports);\n  const instance = await WebAssembly.instantiate(module, imports);\n  const exports = postInstantiate(extended, instance);\n  return { module, instance, exports };\n}\n\nexports.instantiate = instantiate;\n\n/** Synchronously instantiates an AssemblyScript module from a WebAssembly.Module or binary buffer. */\nfunction instantiateSync(source, imports = {}) {\n  const module = isModule(source) ? source : new WebAssembly.Module(source);\n  const extended = preInstantiate(imports);\n  const instance = new WebAssembly.Instance(module, imports);\n  const exports = postInstantiate(extended, instance);\n  return { module, instance, exports };\n}\n\nexports.instantiateSync = instantiateSync;\n\n/** Asynchronously instantiates an AssemblyScript module from a response, i.e. as obtained by `fetch`. */\nasync function instantiateStreaming(source, imports = {}) {\n  if (!WebAssembly.instantiateStreaming) {\n    return instantiate(\n      isResponse(source = await source)\n        ? source.arrayBuffer()\n        : source,\n      imports\n    );\n  }\n  const extended = preInstantiate(imports);\n  const result = await WebAssembly.instantiateStreaming(source, imports);\n  const exports = postInstantiate(extended, result.instance);\n  return { ...result, exports };\n}\n\nexports.instantiateStreaming = instantiateStreaming;\n\n/** Demangles an AssemblyScript module's exports to a friendly object structure. */\nfunction demangle(exports, extendedExports = {}) {\n  extendedExports = Object.create(extendedExports);\n  const setArgumentsLength = exports[\"__argumentsLength\"]\n    ? length => { exports[\"__argumentsLength\"].value = length; }\n    : exports[\"__setArgumentsLength\"] || exports[\"__setargc\"] || (() => { /* nop */ });\n  for (let internalName in exports) {\n    if (!Object.prototype.hasOwnProperty.call(exports, internalName)) continue;\n    const elem = exports[internalName];\n    let parts = internalName.split(\".\");\n    let curr = extendedExports;\n    while (parts.length > 1) {\n      let part = parts.shift();\n      if (!Object.prototype.hasOwnProperty.call(curr, part)) curr[part] = {};\n      curr = curr[part];\n    }\n    let name = parts[0];\n    let hash = name.indexOf(\"#\");\n    if (hash >= 0) {\n      const className = name.substring(0, hash);\n      const classElem = curr[className];\n      if (typeof classElem === \"undefined\" || !classElem.prototype) {\n        const ctor = function(...args) {\n          return ctor.wrap(ctor.prototype.constructor(0, ...args));\n        };\n        ctor.prototype = {\n          valueOf: function valueOf() {\n            return this[THIS];\n          }\n        };\n        ctor.wrap = function(thisValue) {\n          return Object.create(ctor.prototype, { [THIS]: { value: thisValue, writable: false } });\n        };\n        if (classElem) Object.getOwnPropertyNames(classElem).forEach(name =>\n          Object.defineProperty(ctor, name, Object.getOwnPropertyDescriptor(classElem, name))\n        );\n        curr[className] = ctor;\n      }\n      name = name.substring(hash + 1);\n      curr = curr[className].prototype;\n      if (/^(get|set):/.test(name)) {\n        if (!Object.prototype.hasOwnProperty.call(curr, name = name.substring(4))) {\n          let getter = exports[internalName.replace(\"set:\", \"get:\")];\n          let setter = exports[internalName.replace(\"get:\", \"set:\")];\n          Object.defineProperty(curr, name, {\n            get: function() { return getter(this[THIS]); },\n            set: function(value) { setter(this[THIS], value); },\n            enumerable: true\n          });\n        }\n      } else {\n        if (name === 'constructor') {\n          (curr[name] = (...args) => {\n            setArgumentsLength(args.length);\n            return elem(...args);\n          }).original = elem;\n        } else { // instance method\n          (curr[name] = function(...args) { // !\n            setArgumentsLength(args.length);\n            return elem(this[THIS], ...args);\n          }).original = elem;\n        }\n      }\n    } else {\n      if (/^(get|set):/.test(name)) {\n        if (!Object.prototype.hasOwnProperty.call(curr, name = name.substring(4))) {\n          Object.defineProperty(curr, name, {\n            get: exports[internalName.replace(\"set:\", \"get:\")],\n            set: exports[internalName.replace(\"get:\", \"set:\")],\n            enumerable: true\n          });\n        }\n      } else if (typeof elem === \"function\" && elem !== setArgumentsLength) {\n        (curr[name] = (...args) => {\n          setArgumentsLength(args.length);\n          return elem(...args);\n        }).original = elem;\n      } else {\n        curr[name] = elem;\n      }\n    }\n  }\n  return extendedExports;\n}\n\nexports.demangle = demangle;\n\n\n//# sourceURL=webpack://%5Bname%5D/./node_modules/@assemblyscript/loader/index.js?");
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./app/main.css":
+/*!************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./app/main.css ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// Imports\nvar ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\nexports = ___CSS_LOADER_API_IMPORT___(false);\n// Module\nexports.push([module.i, \"\\r\\n.game {\\r\\n    text-align:center;\\r\\n}\\r\\n.board, .controls {\\r\\n    display: inline-block;\\r\\n    vertical-align: middle;\\r\\n}\\r\\n.controls {\\r\\n    text-align: left;\\r\\n}\\r\\n\\r\\n.controls > label, .controls > input {\\r\\n    margin-bottom: 0px;\\r\\n}\\r\\n\\r\\n.controls > button {\\r\\n    margin-bottom: 4px;\\r\\n}\\r\\n\\r\\n.gameLink {\\r\\n    margin-top: 4px;\\r\\n}\\r\\n\\r\\n.square {\\r\\n    background: var(--background, green);\\r\\n    border: 1px solid black;\\r\\n    width: 40px;\\r\\n    height: 40px;\\r\\n    display: inline-block;\\r\\n    margin-right: -1;\\r\\n    margin-bottom: -1;\\r\\n}\\r\\n\\r\\n.square:hover {\\r\\n    background: var(--background-hover, yellowgreen);\\r\\n}\\r\\n\\r\\n.square > .piece {\\r\\n    background: none;\\r\\n    border-radius: 100%;\\r\\n    position: relative;\\r\\n    display: flex;\\r\\n    align-items: center;\\r\\n    top: 50%;\\r\\n    left: 50%;\\r\\n    transform: translate(-50%, -50%);\\r\\n}\", \"\"]);\n// Exports\nmodule.exports = exports;\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/main.css?./node_modules/css-loader/dist/cjs.js");
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n*/\n// css base code, injected by the css-loader\n// eslint-disable-next-line func-names\nmodule.exports = function (useSourceMap) {\n  var list = []; // return the list of modules as css string\n\n  list.toString = function toString() {\n    return this.map(function (item) {\n      var content = cssWithMappingToString(item, useSourceMap);\n\n      if (item[2]) {\n        return \"@media \".concat(item[2], \" {\").concat(content, \"}\");\n      }\n\n      return content;\n    }).join('');\n  }; // import a list of modules into the list\n  // eslint-disable-next-line func-names\n\n\n  list.i = function (modules, mediaQuery, dedupe) {\n    if (typeof modules === 'string') {\n      // eslint-disable-next-line no-param-reassign\n      modules = [[null, modules, '']];\n    }\n\n    var alreadyImportedModules = {};\n\n    if (dedupe) {\n      for (var i = 0; i < this.length; i++) {\n        // eslint-disable-next-line prefer-destructuring\n        var id = this[i][0];\n\n        if (id != null) {\n          alreadyImportedModules[id] = true;\n        }\n      }\n    }\n\n    for (var _i = 0; _i < modules.length; _i++) {\n      var item = [].concat(modules[_i]);\n\n      if (dedupe && alreadyImportedModules[item[0]]) {\n        // eslint-disable-next-line no-continue\n        continue;\n      }\n\n      if (mediaQuery) {\n        if (!item[2]) {\n          item[2] = mediaQuery;\n        } else {\n          item[2] = \"\".concat(mediaQuery, \" and \").concat(item[2]);\n        }\n      }\n\n      list.push(item);\n    }\n  };\n\n  return list;\n};\n\nfunction cssWithMappingToString(item, useSourceMap) {\n  var content = item[1] || ''; // eslint-disable-next-line prefer-destructuring\n\n  var cssMapping = item[3];\n\n  if (!cssMapping) {\n    return content;\n  }\n\n  if (useSourceMap && typeof btoa === 'function') {\n    var sourceMapping = toComment(cssMapping);\n    var sourceURLs = cssMapping.sources.map(function (source) {\n      return \"/*# sourceURL=\".concat(cssMapping.sourceRoot || '').concat(source, \" */\");\n    });\n    return [content].concat(sourceURLs).concat([sourceMapping]).join('\\n');\n  }\n\n  return [content].join('\\n');\n} // Adapted from convert-source-map (MIT)\n\n\nfunction toComment(sourceMap) {\n  // eslint-disable-next-line no-undef\n  var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));\n  var data = \"sourceMappingURL=data:application/json;charset=utf-8;base64,\".concat(base64);\n  return \"/*# \".concat(data, \" */\");\n}\n\n//# sourceURL=webpack://%5Bname%5D/./node_modules/css-loader/dist/runtime/api.js?");
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\nvar isOldIE = function isOldIE() {\n  var memo;\n  return function memorize() {\n    if (typeof memo === 'undefined') {\n      // Test for IE <= 9 as proposed by Browserhacks\n      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805\n      // Tests for existence of standard globals is to allow style-loader\n      // to operate correctly into non-standard environments\n      // @see https://github.com/webpack-contrib/style-loader/issues/177\n      memo = Boolean(window && document && document.all && !window.atob);\n    }\n\n    return memo;\n  };\n}();\n\nvar getTarget = function getTarget() {\n  var memo = {};\n  return function memorize(target) {\n    if (typeof memo[target] === 'undefined') {\n      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself\n\n      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {\n        try {\n          // This will throw an exception if access to iframe is blocked\n          // due to cross-origin restrictions\n          styleTarget = styleTarget.contentDocument.head;\n        } catch (e) {\n          // istanbul ignore next\n          styleTarget = null;\n        }\n      }\n\n      memo[target] = styleTarget;\n    }\n\n    return memo[target];\n  };\n}();\n\nvar stylesInDom = [];\n\nfunction getIndexByIdentifier(identifier) {\n  var result = -1;\n\n  for (var i = 0; i < stylesInDom.length; i++) {\n    if (stylesInDom[i].identifier === identifier) {\n      result = i;\n      break;\n    }\n  }\n\n  return result;\n}\n\nfunction modulesToDom(list, options) {\n  var idCountMap = {};\n  var identifiers = [];\n\n  for (var i = 0; i < list.length; i++) {\n    var item = list[i];\n    var id = options.base ? item[0] + options.base : item[0];\n    var count = idCountMap[id] || 0;\n    var identifier = \"\".concat(id, \" \").concat(count);\n    idCountMap[id] = count + 1;\n    var index = getIndexByIdentifier(identifier);\n    var obj = {\n      css: item[1],\n      media: item[2],\n      sourceMap: item[3]\n    };\n\n    if (index !== -1) {\n      stylesInDom[index].references++;\n      stylesInDom[index].updater(obj);\n    } else {\n      stylesInDom.push({\n        identifier: identifier,\n        updater: addStyle(obj, options),\n        references: 1\n      });\n    }\n\n    identifiers.push(identifier);\n  }\n\n  return identifiers;\n}\n\nfunction insertStyleElement(options) {\n  var style = document.createElement('style');\n  var attributes = options.attributes || {};\n\n  if (typeof attributes.nonce === 'undefined') {\n    var nonce =  true ? __webpack_require__.nc : undefined;\n\n    if (nonce) {\n      attributes.nonce = nonce;\n    }\n  }\n\n  Object.keys(attributes).forEach(function (key) {\n    style.setAttribute(key, attributes[key]);\n  });\n\n  if (typeof options.insert === 'function') {\n    options.insert(style);\n  } else {\n    var target = getTarget(options.insert || 'head');\n\n    if (!target) {\n      throw new Error(\"Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.\");\n    }\n\n    target.appendChild(style);\n  }\n\n  return style;\n}\n\nfunction removeStyleElement(style) {\n  // istanbul ignore if\n  if (style.parentNode === null) {\n    return false;\n  }\n\n  style.parentNode.removeChild(style);\n}\n/* istanbul ignore next  */\n\n\nvar replaceText = function replaceText() {\n  var textStore = [];\n  return function replace(index, replacement) {\n    textStore[index] = replacement;\n    return textStore.filter(Boolean).join('\\n');\n  };\n}();\n\nfunction applyToSingletonTag(style, index, remove, obj) {\n  var css = remove ? '' : obj.media ? \"@media \".concat(obj.media, \" {\").concat(obj.css, \"}\") : obj.css; // For old IE\n\n  /* istanbul ignore if  */\n\n  if (style.styleSheet) {\n    style.styleSheet.cssText = replaceText(index, css);\n  } else {\n    var cssNode = document.createTextNode(css);\n    var childNodes = style.childNodes;\n\n    if (childNodes[index]) {\n      style.removeChild(childNodes[index]);\n    }\n\n    if (childNodes.length) {\n      style.insertBefore(cssNode, childNodes[index]);\n    } else {\n      style.appendChild(cssNode);\n    }\n  }\n}\n\nfunction applyToTag(style, options, obj) {\n  var css = obj.css;\n  var media = obj.media;\n  var sourceMap = obj.sourceMap;\n\n  if (media) {\n    style.setAttribute('media', media);\n  } else {\n    style.removeAttribute('media');\n  }\n\n  if (sourceMap && btoa) {\n    css += \"\\n/*# sourceMappingURL=data:application/json;base64,\".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), \" */\");\n  } // For old IE\n\n  /* istanbul ignore if  */\n\n\n  if (style.styleSheet) {\n    style.styleSheet.cssText = css;\n  } else {\n    while (style.firstChild) {\n      style.removeChild(style.firstChild);\n    }\n\n    style.appendChild(document.createTextNode(css));\n  }\n}\n\nvar singleton = null;\nvar singletonCounter = 0;\n\nfunction addStyle(obj, options) {\n  var style;\n  var update;\n  var remove;\n\n  if (options.singleton) {\n    var styleIndex = singletonCounter++;\n    style = singleton || (singleton = insertStyleElement(options));\n    update = applyToSingletonTag.bind(null, style, styleIndex, false);\n    remove = applyToSingletonTag.bind(null, style, styleIndex, true);\n  } else {\n    style = insertStyleElement(options);\n    update = applyToTag.bind(null, style, options);\n\n    remove = function remove() {\n      removeStyleElement(style);\n    };\n  }\n\n  update(obj);\n  return function updateStyle(newObj) {\n    if (newObj) {\n      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {\n        return;\n      }\n\n      update(obj = newObj);\n    } else {\n      remove();\n    }\n  };\n}\n\nmodule.exports = function (list, options) {\n  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>\n  // tags it will allow on a page\n\n  if (!options.singleton && typeof options.singleton !== 'boolean') {\n    options.singleton = isOldIE();\n  }\n\n  list = list || [];\n  var lastIdentifiers = modulesToDom(list, options);\n  return function update(newList) {\n    newList = newList || [];\n\n    if (Object.prototype.toString.call(newList) !== '[object Array]') {\n      return;\n    }\n\n    for (var i = 0; i < lastIdentifiers.length; i++) {\n      var identifier = lastIdentifiers[i];\n      var index = getIndexByIdentifier(identifier);\n      stylesInDom[index].references--;\n    }\n\n    var newLastIdentifiers = modulesToDom(newList, options);\n\n    for (var _i = 0; _i < lastIdentifiers.length; _i++) {\n      var _identifier = lastIdentifiers[_i];\n\n      var _index = getIndexByIdentifier(_identifier);\n\n      if (stylesInDom[_index].references === 0) {\n        stylesInDom[_index].updater();\n\n        stylesInDom.splice(_index, 1);\n      }\n    }\n\n    lastIdentifiers = newLastIdentifiers;\n  };\n};\n\n//# sourceURL=webpack://%5Bname%5D/./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js?");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Board.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Board.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Square_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Square.vue */ \"./app/vue/Square.vue\");\n/* harmony import */ var _othello__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../othello */ \"./app/othello.js\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\r\n\r\n\r\n\r\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\r\n    name: \"board\",\r\n    props: ['gameState'],\r\n    components: { Square: _Square_vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"] },\r\n    computed: {},\r\n    methods: {\r\n        index(row, col) {\r\n            return _othello__WEBPACK_IMPORTED_MODULE_1__[\"getIndex\"](row-1, col-1);\r\n        },\r\n    }\r\n});\r\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Board.vue?./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Game.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Game.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Board_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Board.vue */ \"./app/vue/Board.vue\");\n/* harmony import */ var _othello__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../othello */ \"./app/othello.js\");\n/* harmony import */ var _interop__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../interop */ \"./app/interop.js\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\r\n\r\n\r\n\r\n\r\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\r\n    name: \"game\",\r\n    props: {\r\n        doMove: { type: Function },\r\n        getBestMove: { type: Function },\r\n    },\r\n    components: { Board: _Board_vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"] },\r\n    computed: {},\r\n    data() {\r\n        var urlParams = new URLSearchParams(window.location.search);\r\n\r\n        var gameState = _othello__WEBPACK_IMPORTED_MODULE_1__[\"Game\"].fromGameLink(urlParams);\r\n\r\n        return {\r\n            gameStates: [gameState],\r\n            gameState: gameState,\r\n            first: gameState.player == _othello__WEBPACK_IMPORTED_MODULE_1__[\"Colors\"].Black ? _othello__WEBPACK_IMPORTED_MODULE_1__[\"Players\"].Player : _othello__WEBPACK_IMPORTED_MODULE_1__[\"Players\"].CPU,\r\n        };\r\n    },\r\n    computed: {\r\n        player : function() {\r\n            return _othello__WEBPACK_IMPORTED_MODULE_1__[\"Players\"].Player;\r\n        },\r\n        cpu: function() {\r\n            return _othello__WEBPACK_IMPORTED_MODULE_1__[\"Players\"].CPU;\r\n        },\r\n        gameLink: function() {\r\n            return this.gameState.getGameLink();\r\n        }\r\n    },\r\n    methods: {\r\n        async clicked(move) {\r\n            var oppositeTurn = _othello__WEBPACK_IMPORTED_MODULE_1__[\"getOppositeColor\"](this.gameState.turn);\r\n\r\n            var newGame = this.move(move);\r\n\r\n            while (newGame && newGame.turn == oppositeTurn) {\r\n                var cpu_move = await this.getBestMove(Object(_interop__WEBPACK_IMPORTED_MODULE_2__[\"piecesToString\"])(this.gameState.pieces), this.gameState.turn);\r\n                if (cpu_move != -1) {\r\n                    newGame = this.move({ row: Math.floor(cpu_move / 8), col: cpu_move % 8 });                   \r\n                } else {\r\n                    break;\r\n                }\r\n            }\r\n            \r\n            return Promise.resolve();\r\n        },\r\n        move(move) {\r\n            var newGameState = this.doMove(this.gameState, move);\r\n            if (newGameState) {\r\n                this.gameStates.push(newGameState);\r\n                this.gameState = this.gameStates[this.gameStates.length-1];\r\n            }\r\n            return newGameState;\r\n        },\r\n        newGame() {\r\n            this.gameStates.push(_othello__WEBPACK_IMPORTED_MODULE_1__[\"Game\"].getNewGame(this.player));\r\n            this.gameState = this.gameStates[this.gameStates.length-1];\r\n\r\n            if (this.first === _othello__WEBPACK_IMPORTED_MODULE_1__[\"Players\"].CPU) {\r\n                var middle = Math.floor(_othello__WEBPACK_IMPORTED_MODULE_1__[\"BOARD_SIZE\"]/2) - 1;\r\n                this.move({ row: middle-1, col: middle});\r\n            }\r\n        },\r\n        undo() {\r\n            if (this.gameStates.length > 1) {\r\n                this.gameStates.pop();\r\n                this.gameState = this.gameStates[this.gameStates.length-1];\r\n            }\r\n        },\r\n        copyGameLink() {\r\n            var input = $('#gameLinkInput')[0]\r\n            input.select();\r\n            input.setSelectionRange(0,1000);\r\n            window.document.execCommand(\"copy\");\r\n\r\n            if (window.getSelection) {\r\n                window.getSelection().removeAllRanges();\r\n            } else if (document.selection) {\r\n                document.selection.empty();\r\n            }\r\n        }\r\n    }\r\n});\r\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Game.vue?./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/index.js?!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Square.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js!./app/vue/Square.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _othello__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../othello */ \"./app/othello.js\");\n//\n//\n//\n//\n//\n//\n//\n//\n\r\n\r\n\r\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\r\n    name: \"square\",\r\n    props: ['row', 'col', 'gameState'],\r\n    computed: {\r\n        squareStyle: function() {\r\n            if (this.row == this.gameState.lastMove[0] && this.col == this.gameState.lastMove[1]) {\r\n                return {\r\n                    \"--background\": \"red\",\r\n                    \"--background-hover\": \"orange\",\r\n                }\r\n            } else {\r\n                return {\r\n                    \"--background\": \"green\",\r\n                    \"--background-hover\": \"yellowgreen\",\r\n                }\r\n            }\r\n        },\r\n        piece: function() {\r\n            return this.gameState.pieces[this.row][this.col];\r\n        },\r\n        validMove: function() {\r\n            return this.gameState.validMoves[this.gameState.turn][this.row][this.col];\r\n        },\r\n        pieceColor: function () {\r\n            if (this.piece === _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black || this.validMove == _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black) {\r\n                return \"black\";\r\n            } else if (this.piece === _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White || this.validMove == _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White) {\r\n                return \"white\";\r\n            } else {             \r\n                return \"none\";\r\n            }\r\n        },\r\n        pieceSize: function() {\r\n            if (this.piece === _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black || this.piece === _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White) {\r\n                return \"32px\";\r\n            } else if (this.validMove == _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].Black || this.validMove == _othello__WEBPACK_IMPORTED_MODULE_0__[\"Colors\"].White) {\r\n                return \"8px\";\r\n            } else {\r\n                return \"0px\";\r\n            }\r\n        },\r\n    }\r\n});\r\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Square.vue?./node_modules/vue-loader/lib??vue-loader-options!./node_modules/source-map-loader/dist/cjs.js");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Board.vue?vue&type=template&id=ea36e71e&":
+/*!****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./app/vue/Board.vue?vue&type=template&id=ea36e71e& ***!
+  \****************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return render; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return staticRenderFns; });\nvar render = function() {\n  var _vm = this\n  var _h = _vm.$createElement\n  var _c = _vm._self._c || _h\n  return _c(\n    \"div\",\n    { staticClass: \"board\" },\n    _vm._l(8, function(row) {\n      return _c(\n        \"div\",\n        { key: row },\n        _vm._l(8, function(col) {\n          return _c(\n            \"square\",\n            _vm._g(\n              {\n                key: _vm.index(row, col),\n                attrs: { row: row - 1, col: col - 1, gameState: _vm.gameState }\n              },\n              _vm.$listeners\n            )\n          )\n        }),\n        1\n      )\n    }),\n    0\n  )\n}\nvar staticRenderFns = []\nrender._withStripped = true\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Board.vue?./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Game.vue?vue&type=template&id=c3e44592&":
+/*!***************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./app/vue/Game.vue?vue&type=template&id=c3e44592& ***!
+  \***************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return render; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return staticRenderFns; });\nvar render = function() {\n  var _vm = this\n  var _h = _vm.$createElement\n  var _c = _vm._self._c || _h\n  return _c(\n    \"div\",\n    { staticClass: \"game\" },\n    [\n      _c(\"board\", {\n        attrs: { gameState: _vm.gameState },\n        on: {\n          clicked: function($event) {\n            return _vm.clicked($event)\n          }\n        }\n      }),\n      _vm._v(\" \"),\n      _c(\"div\", { staticClass: \"controls\" }, [\n        _c(\"br\"),\n        _vm._v(\" \"),\n        _c(\"input\", {\n          directives: [\n            {\n              name: \"model\",\n              rawName: \"v-model\",\n              value: _vm.first,\n              expression: \"first\"\n            }\n          ],\n          attrs: { type: \"radio\", id: \"player\" },\n          domProps: {\n            value: _vm.player,\n            checked: _vm._q(_vm.first, _vm.player)\n          },\n          on: {\n            change: function($event) {\n              _vm.first = _vm.player\n            }\n          }\n        }),\n        _vm._v(\" \"),\n        _c(\"label\", { attrs: { for: \"player\" } }, [_vm._v(\"Player First\")]),\n        _vm._v(\" \"),\n        _c(\"br\"),\n        _vm._v(\" \"),\n        _c(\"input\", {\n          directives: [\n            {\n              name: \"model\",\n              rawName: \"v-model\",\n              value: _vm.first,\n              expression: \"first\"\n            }\n          ],\n          attrs: { type: \"radio\", id: \"cpu\" },\n          domProps: { value: _vm.cpu, checked: _vm._q(_vm.first, _vm.cpu) },\n          on: {\n            change: function($event) {\n              _vm.first = _vm.cpu\n            }\n          }\n        }),\n        _vm._v(\" \"),\n        _c(\"label\", { attrs: { for: \"cpu\" } }, [_vm._v(\"CPU First\")]),\n        _vm._v(\" \"),\n        _c(\"br\"),\n        _vm._v(\" \"),\n        _c(\n          \"button\",\n          {\n            on: {\n              click: function($event) {\n                return _vm.newGame()\n              }\n            }\n          },\n          [_vm._v(\"New Game\")]\n        ),\n        _vm._v(\" \"),\n        _c(\"br\"),\n        _vm._v(\" \"),\n        _c(\n          \"button\",\n          {\n            on: {\n              click: function($event) {\n                return _vm.undo()\n              }\n            }\n          },\n          [_vm._v(\"Undo\")]\n        )\n      ]),\n      _vm._v(\" \"),\n      _c(\"br\"),\n      _vm._v(\" \"),\n      _c(\"div\", { staticClass: \"gameLink\" }, [\n        _c(\n          \"button\",\n          {\n            on: {\n              click: function($event) {\n                return _vm.copyGameLink()\n              }\n            }\n          },\n          [_vm._v(\"Copy Game Link\")]\n        ),\n        _vm._v(\" \"),\n        _c(\"input\", {\n          attrs: { type: \"text\", id: \"gameLinkInput\" },\n          domProps: { value: _vm.gameLink }\n        })\n      ])\n    ],\n    1\n  )\n}\nvar staticRenderFns = []\nrender._withStripped = true\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Game.vue?./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./app/vue/Square.vue?vue&type=template&id=2fa3b4bc&":
+/*!*****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./app/vue/Square.vue?vue&type=template&id=2fa3b4bc& ***!
+  \*****************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"render\", function() { return render; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"staticRenderFns\", function() { return staticRenderFns; });\nvar render = function() {\n  var _vm = this\n  var _h = _vm.$createElement\n  var _c = _vm._self._c || _h\n  return _c(\n    \"a\",\n    {\n      staticClass: \"square\",\n      style: _vm.squareStyle,\n      on: {\n        click: function($event) {\n          return _vm.$emit(\"clicked\", { row: _vm.row, col: _vm.col })\n        }\n      }\n    },\n    [\n      _c(\"div\", {\n        staticClass: \"piece\",\n        style: {\n          background: _vm.pieceColor,\n          width: _vm.pieceSize,\n          height: _vm.pieceSize\n        }\n      })\n    ]\n  )\n}\nvar staticRenderFns = []\nrender._withStripped = true\n\n\n\n//# sourceURL=webpack://%5Bname%5D/./app/vue/Square.vue?./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options");
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!
+  \********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return normalizeComponent; });\n/* globals __VUE_SSR_CONTEXT__ */\n\n// IMPORTANT: Do NOT use ES2015 features in this file (except for modules).\n// This module is a runtime utility for cleaner component module output and will\n// be included in the final webpack user bundle.\n\nfunction normalizeComponent (\n  scriptExports,\n  render,\n  staticRenderFns,\n  functionalTemplate,\n  injectStyles,\n  scopeId,\n  moduleIdentifier, /* server only */\n  shadowMode /* vue-cli only */\n) {\n  // Vue.extend constructor export interop\n  var options = typeof scriptExports === 'function'\n    ? scriptExports.options\n    : scriptExports\n\n  // render functions\n  if (render) {\n    options.render = render\n    options.staticRenderFns = staticRenderFns\n    options._compiled = true\n  }\n\n  // functional template\n  if (functionalTemplate) {\n    options.functional = true\n  }\n\n  // scopedId\n  if (scopeId) {\n    options._scopeId = 'data-v-' + scopeId\n  }\n\n  var hook\n  if (moduleIdentifier) { // server build\n    hook = function (context) {\n      // 2.3 injection\n      context =\n        context || // cached call\n        (this.$vnode && this.$vnode.ssrContext) || // stateful\n        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional\n      // 2.2 with runInNewContext: true\n      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {\n        context = __VUE_SSR_CONTEXT__\n      }\n      // inject component styles\n      if (injectStyles) {\n        injectStyles.call(this, context)\n      }\n      // register component module identifier for async chunk inferrence\n      if (context && context._registeredComponents) {\n        context._registeredComponents.add(moduleIdentifier)\n      }\n    }\n    // used by ssr in case component is cached and beforeCreate\n    // never gets called\n    options._ssrRegister = hook\n  } else if (injectStyles) {\n    hook = shadowMode\n      ? function () {\n        injectStyles.call(\n          this,\n          (options.functional ? this.parent : this).$root.$options.shadowRoot\n        )\n      }\n      : injectStyles\n  }\n\n  if (hook) {\n    if (options.functional) {\n      // for template-only hot-reload because in that case the render fn doesn't\n      // go through the normalizer\n      options._injectStyles = hook\n      // register for functional component in vue file\n      var originalRender = options.render\n      options.render = function renderWithStyleInjection (h, context) {\n        hook.call(context)\n        return originalRender(h, context)\n      }\n    } else {\n      // inject component registration as beforeCreate hook\n      var existing = options.beforeCreate\n      options.beforeCreate = existing\n        ? [].concat(existing, hook)\n        : [hook]\n    }\n  }\n\n  return {\n    exports: scriptExports,\n    options: options\n  }\n}\n\n\n//# sourceURL=webpack://%5Bname%5D/./node_modules/vue-loader/lib/runtime/componentNormalizer.js?");
+
+/***/ })
+
+/******/ });

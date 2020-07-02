@@ -6,7 +6,7 @@ import { EDGE_SCORES } from "./edgeStability";
 
 import { piecesToString } from "./interop";
 
-const DEPTH: u8 = 9;
+const DEPTH: u8 = 8;
 const BRANCHING_FACTOR: u8 = 12;
 
 const PARITY_WEIGHT: f64 = 10;
