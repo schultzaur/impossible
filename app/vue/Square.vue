@@ -30,7 +30,11 @@ export default {
             return this.gameState.pieces[this.row][this.col];
         },
         validMove: function() {
-            return this.gameState.validMoves[this.gameState.turn][this.row][this.col];
+            if (this.gameState.turn == othello.Colors.None) {
+                return othello.Colors.None;
+            } else {
+                return this.gameState.validMoves[this.gameState.turn][this.row][this.col];
+            }
         },
         pieceColor: function () {
             if (this.piece === othello.Colors.Black || this.validMove == othello.Colors.Black) {
