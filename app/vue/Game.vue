@@ -59,6 +59,14 @@ export default {
             return this.gameState.getGameLink();
         }
     },
+    watch: {
+        first: function(player) {
+            if (player == othello.Players.CPU && this.gameStates.length == 1) {
+                var middle = Math.floor(othello.BOARD_SIZE/2) - 1;
+                this.move({ row: middle-1, col: middle });
+            }
+        }
+    },
     methods: {
         async clicked(move) {
             var oppositeTurn = othello.getOppositeColor(this.gameState.turn);
